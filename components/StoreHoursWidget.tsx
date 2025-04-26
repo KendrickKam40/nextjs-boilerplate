@@ -71,15 +71,25 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
   const isOpen = openStatus === 1;
 
   if (compact) {
-    return (
-      <div className="flex items-center space-x-1 text-xs text-[#24333F]">
-        <Clock className={`h-4 w-4 ${isOpen ? 'text-[#22C55E]' : 'text-[#EF4444]'}`} />
-        <span className={isOpen ? 'text-[#22C55E]' : 'text-[#EF4444]'}>
-          {isOpen ? 'Open' : 'Closed'}
-        </span>
-        <span className="text-[#4A5058]">· {todayHours}</span>
-      </div>
-    );
+       return (
+         <div className="flex items-center text-[#24333F]">
+           {/* always show just the clock & status text on xs */}
+           <Clock
+             className={`h-4 w-4 ${
+               isOpen ? 'text-[#22C55E]' : 'text-[#EF4444]'
+             }`}
+           />
+    
+           <span className="ml-1 text-xs font-medium">
+             {isOpen ? 'Open' : 'Closed'}
+           </span>
+    
+           {/* show hours at md+ */}
+           <span className="ml-1 text-xs text-[#4A5058] hidden md:inline">
+             · {todayHours}
+           </span>
+         </div>
+       );
   }
 
   // full version (unchanged)

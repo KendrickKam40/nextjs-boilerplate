@@ -18,14 +18,14 @@ const StoreHoursWidget = dynamic(
 
 export default function HomePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [activeModal, setActiveModal] = useState<'about' | ''>('');
-  const [points, setPoints] = useState(50);
+  const [activeModal, setActiveModal] = useState<'about' | 'points' | ''>('');
 
-  const handleRedeem = () => {
+  const handleRedeem = (amount: number) => {
     const win = iframeRef.current?.contentWindow;
-    if (!win) return console.warn('Iframe not ready yet');
-    win.postMessage({ action: 'redeemPoints', amount: points }, '*');
+    if (!win) return;
+    win.postMessage({ action: 'redeemPoints', amount }, '*');
   };
+  
 
   const options: MenuOption[] = [
     { label: 'Order Online', onClick: () => {/* ordering logic */} },
@@ -35,7 +35,7 @@ export default function HomePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#FAF3EA] flex flex-col items-center px-4 sm:px-6 lg:px-12 py-6 space-y-12">
+    <main className="min-h-screen bg-[#FAF3EA] flex flex-col items-center px-4 sm:px-6 lg:px-12 py-6 space-y-6">
 
       {/* Top Navigation */}
       <header className="w-full max-w-6xl grid grid-cols-3 items-center px-4">
@@ -56,13 +56,24 @@ export default function HomePage() {
       </div>
 
       {/* right slot: your Menu */}
-      <div className="flex justify-end">
-        <Menu options={options} buttonColor="#24333F" />
-      </div>
+      <div className="flex items-center justify-end space-x-4">
+          {/* 1. Star icon opens the points modal */}
+          <button
+            onClick={() => setActiveModal('points')}
+            aria-label="My Points"
+            className="relative p-1 rounded-full hover:bg-black/10"
+          >
+            <Star className="h-6 w-6 text-[#24333F]" />
+           
+          </button>
+
+          {/* 2. your hamburger menu */}
+          <Menu options={options} buttonColor="#24333F" />
+        </div>
     </header>
 
       {/* Hero Section */}
-      <section className="w-full max-w-6xl flex flex-col-reverse lg:flex-row items-center bg-[#F2EAE2] rounded-2xl overflow-hidden">
+      <section className="w-full max-w-6xl flex flex-col-reverse lg:flex-row items-center bg-[#F2EAE2] rounded-2xl overflow-hidden shadow-md">
         {/* Text & CTA */}
         <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#24333F] leading-tight">
@@ -97,12 +108,14 @@ export default function HomePage() {
           title: 'Our Story',
           text: 'Learn more about us',
           btn: <Button variant="outline" color="#d6112c" className="w-full text-sm py-2" onClick={() => setActiveModal('about')}>Read More</Button>,
-        },{
-          icon: <Star className="h-10 w-10 text-[#d6112c]" />,
-          title: 'Your Points',
-          text: '',
-          btn: <LoyaltyDashboard currentPoints={points} nextTier={200} onRedeem={handleRedeem} horizontal />,
-        }].map((card, i) => (
+        },
+        // {
+        //   icon: <Star className="h-10 w-10 text-[#d6112c]" />,
+        //   title: 'Your Points',
+        //   text: '',
+        //   btn: <LoyaltyDashboard currentPoints={points} nextTier={200} onRedeem={handleRedeem} />,
+        // }
+        ].map((card, i) => (
           <Card key={i} bgColor="#F2EAE2" className="px-4 sm:px-6 py-6 flex flex-col items-center text-center space-y-3">
             {card.icon}
             <h3 className="text-lg font-semibold text-[#24333F]">{card.title}</h3>
@@ -110,12 +123,10 @@ export default function HomePage() {
             {card.btn}
           </Card>
         ))}
-      </section>
 
-      {/* Widgets Section */}
-      <section className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SeasonalSpecialsWidget />
       </section>
+
 
       {/* About Us Modal */}
       <Modal
@@ -123,7 +134,7 @@ export default function HomePage() {
         title="About Us"
         bgColor="#F2EAE2"
         textColor="#000"
-        width="90%"
+        width="400px"
         onClose={() => setActiveModal('')}
       >
         <div className="relative w-full h-40 sm:h-60 overflow-hidden rounded-2xl mb-4">
@@ -140,6 +151,24 @@ export default function HomePage() {
           and soul.
         </p>
       </Modal>
+
+    <Modal
+      open={activeModal === 'points'}
+      title="My Points"
+      bgColor="#F2EAE2"
+      textColor="#000"
+      width="400px"
+      onClose={() => setActiveModal('')}
+    >
+      <div className="px-4 py-2">
+        <LoyaltyDashboard
+          nextTier={200}
+          onRedeem={handleRedeem}
+        />
+      </div>
+    </Modal>
+
+      {/* Footer */}
 
       <footer className="w-full max-w-6xl text-center py-6 text-xs sm:text-sm text-[#24333F]">
         &copy; 2024 Balibu &nbsp;|&nbsp; Privacy &nbsp;|&nbsp; Terms

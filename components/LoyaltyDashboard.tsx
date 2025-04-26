@@ -3,67 +3,146 @@
 
 import React, { useEffect, useState } from 'react';
 import Modal from './Modal';
+import Button from './Button';
 
 interface LoyaltyDashboardProps {
-  /** Current user points */
-  currentPoints: number;
   /** Points needed to reach next tier/milestone */
   nextTier: number;
-  /** Handler when redeem button is clicked */
-  onRedeem: () => void;
+  /** Callback when points are redeemed; receives the amount redeemed */
+  onRedeem: (amount: number) => void;
 }
 
 /**
- * Displays a horizontal progress bar toward the next reward tier,
- * allows redeeming points, and shows a milestone modal.
+ * A dashboard that first asks for email (once), remembers it in localStorage,
+ * then shows points, progress bar, redemption CTA, and allows logout.
+ * Styled to match Balibu’s main color scheme.
  */
-const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({
-  currentPoints,
-  nextTier,
-  onRedeem,
-}) => {
+const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ nextTier, onRedeem }) => {
+  const [email, setEmail] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPoints, setCurrentPoints] = useState(0);
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
 
-  // Calculate progress percentage (capped at 100%)
-  const progress = Math.min((currentPoints / nextTier) * 100, 100);
+  const accent = '#d6112c';
+  const progressPct = Math.min((currentPoints / nextTier) * 100, 100);
 
   useEffect(() => {
-    // When user hits or exceeds the milestone, show popup once
-    if (currentPoints >= nextTier) {
-      setShowMilestoneModal(true);
+    const savedEmail = localStorage.getItem('loyaltyEmail');
+    const savedPoints = localStorage.getItem('loyaltyPoints');
+    if (savedEmail && savedPoints) {
+      setEmail(savedEmail);
+      setCurrentPoints(Number(savedPoints));
+      setIsVerified(true);
     }
-  }, [currentPoints, nextTier]);
+  }, []);
+
+  useEffect(() => {
+    if (isVerified && currentPoints >= nextTier) setShowMilestoneModal(true);
+  }, [isVerified, currentPoints, nextTier]);
+
+  const handleVerify = async () => {
+    setError(null);
+    try {
+      const res = await fetch('/api/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error('Failed to verify');
+      const { points } = await res.json();
+      setCurrentPoints(points);
+      setIsVerified(true);
+      localStorage.setItem('loyaltyEmail', email);
+      localStorage.setItem('loyaltyPoints', String(points));
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const handleRedeem = () => {
+    onRedeem(currentPoints);
+    const remaining = Math.max(currentPoints - nextTier, 0);
+    setCurrentPoints(remaining);
+    localStorage.setItem('loyaltyPoints', String(remaining));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('loyaltyEmail');
+    localStorage.removeItem('loyaltyPoints');
+    setEmail('');
+    setCurrentPoints(0);
+    setIsVerified(false);
+    setError(null);
+  };
+
+  if (!isVerified) {
+    return (
+      <div className="bg-[#F2EAE2] rounded-2xl p-4 space-y-4 max-w-xs border border-[#d6112c]">
+        <h3 className="text-lg font-semibold text-[#24333F]">Loyalty Login</h3>
+        <input
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-lg"
+        />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <Button
+          fullWidth
+          onClick={handleVerify}
+          color={accent}
+          className={`${!email && 'opacity-50 pointer-events-none'}`}
+        >
+          Verify
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col items-stretch space-y-4 p-4 bg-[#F2EAE2] rounded-2xl shadow-md">
-      <div className="flex justify-between items-center">
-        <span className="font-semibold text-gray-700">Points: {currentPoints}</span>
-        <span className="text-sm text-gray-500">/ {nextTier}</span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-lg h-4 overflow-hidden">
-        <div
-          className="h-full bg-[#F33550] transition-all"
-          style={{ width: `${progress}%` }}
-        ></div>
-      </div>
-      <p className="text-sm text-gray-600">{Math.max(nextTier - currentPoints, 0)} points until your next reward</p>
-      {/* <button
-        onClick={onRedeem}
-        className="px-4 py-2 bg-[#F33550] text-white rounded-lg font-semibold cursor-pointer"
-      >
-        Redeem Points
-      </button> */}
+    <div className="bg-[#F2EAE2] rounded-2xl p-6 space-y-6 max-w-xs border border-[#d6112c]">
+      <h3 className="text-xl font-semibold text-[#24333F]">Your Loyalty</h3>
 
-      {/* Milestone Modal */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white p-3 rounded-lg text-center">
+          <p className="text-2xl font-bold text-[#d6112c]">{currentPoints}</p>
+          <p className="text-sm text-[#24333F]">Points</p>
+        </div>
+        <div className="bg-white p-3 rounded-lg text-center">
+          <p className="text-2xl font-bold text-[#24333F]">{Math.max(nextTier - currentPoints, 0)}</p>
+          <p className="text-sm text-[#24333F]">To Next</p>
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <p className="text-sm text-[#4A5058]">Progress</p>
+        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+          <div
+            className="h-full"
+            style={{ width: `${progressPct}%`, backgroundColor: accent }}
+          />
+        </div>
+      </div>
+
+      <div className="flex space-x-2">
+        <Button fullWidth onClick={handleRedeem} color={accent} className="text-sm">
+          Redeem
+        </Button>
+        <Button fullWidth variant="outline" color={accent} className="text-sm">
+          Logout
+        </Button>
+      </div>
+
       <Modal
         open={showMilestoneModal}
         title="Congrats!"
         bgColor="#FFFFFF"
-        textColor="#000000"
-        width="300px"
+        textColor="#000"
+        width="280px"
         onClose={() => setShowMilestoneModal(false)}
       >
-        <p>You’ve reached {nextTier} points—enjoy a free dessert!</p>
+        <p className="text-center text-[#24333F]">{`You've reached ${nextTier} points!`}</p>
       </Modal>
     </div>
   );
