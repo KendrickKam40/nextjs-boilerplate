@@ -5,3 +5,11 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// next.config.js
+/** @type {import('next').NextConfig} */
+module.exports = {
+  images: {
+    domains: ['firebasestorage.googleapis.com'],
+  },
+};

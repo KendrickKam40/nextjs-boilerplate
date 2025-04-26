@@ -31,7 +31,7 @@ const Modal: React.FC<ModalProps> = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 mb-0">
       <div
         className="rounded-2xl shadow-lg mx-4"
         style={{
