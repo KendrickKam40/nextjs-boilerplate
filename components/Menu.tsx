@@ -1,4 +1,3 @@
-// components/Menu.tsx
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu as MenuIcon } from 'lucide-react';
@@ -13,13 +12,14 @@ export interface MenuOption {
 interface MenuProps {
   /** Array of menu options */
   options: MenuOption[];
+  /** Icon and text color for the button/menu items */
   buttonColor?: string;
 }
 
 /**
  * A dropdown menu component. Click the hamburger to toggle.
  */
-const Menu: React.FC<MenuProps> = ({ options , buttonColor}) => {
+const Menu: React.FC<MenuProps> = ({ options, buttonColor = '#000' }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleToggle = () => setOpen(prev => !prev);
@@ -28,8 +28,6 @@ const Menu: React.FC<MenuProps> = ({ options , buttonColor}) => {
     setOpen(false);
   };
 
-  const buttonColorClass = buttonColor ? `text-[${buttonColor}]` : 'text-black';
-
   return (
     <div className="relative inline-block text-left">
       <button
@@ -37,7 +35,8 @@ const Menu: React.FC<MenuProps> = ({ options , buttonColor}) => {
         aria-label="Open menu"
         className="p-2 rounded-lg hover:bg-black/10 cursor-pointer"
       >
-        <MenuIcon className={buttonColorClass} />
+        {/* Use inline style for dynamic color */}
+        <MenuIcon color={buttonColor} />
       </button>
 
       <AnimatePresence>
@@ -53,7 +52,8 @@ const Menu: React.FC<MenuProps> = ({ options , buttonColor}) => {
                 <button
                   key={idx}
                   onClick={() => handleOption(opt)}
-                  className="w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100 cursor-pointer"
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                  style={{ color: "#000" }}
                 >
                   {opt.label}
                 </button>
