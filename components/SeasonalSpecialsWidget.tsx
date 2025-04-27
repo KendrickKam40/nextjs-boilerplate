@@ -61,7 +61,7 @@ export default function SeasonalSpecialsWidget() {
   }
 
   return (
-    <div className="bg-[#F2EAE2] rounded-2xl w-full border border-[#EAE0DA] overflow-hidden">
+    <div className="bg-[#F2EAE2] rounded-2xl w-full border border-[#EAE0DA] overflow-hidden shadow-md">
       {/* Header */}
       <div className="flex items-center space-x-2 px-6 py-4">
         <Star className="h-5 w-5 text-[#d6112c]" />

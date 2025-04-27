@@ -23,6 +23,11 @@ export default function LoyaltyDashboard() {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const inputsRef = useRef<Array<HTMLInputElement | null>>(Array(6).fill(null));
 
+  // Error messages
+  const [errorSms, setErrorSms] = useState('');
+  const [errorVerify, setErrorVerify] = useState('');
+  const [errorFetch, setErrorFetch] = useState('');
+
   // Loading flags
   const [loadingSms, setLoadingSms] = useState(false);
   const [loadingVerify, setLoadingVerify] = useState(false);
@@ -40,18 +45,21 @@ export default function LoyaltyDashboard() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // clear logout errors
         setLoadingLogout(false);
         setLoadingPoints(true);
+        setErrorFetch('');
         try {
           const idToken = await user.getIdToken();
           const res = await fetch('/api/points', {
             headers: { Authorization: `Bearer ${idToken}` },
           });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          if (!res.ok) throw new Error(`Failed to fetch points (${res.status})`);
           const data = await res.json();
           setCurrentPoints(data.points);
-        } catch (err) {
+        } catch (err: any) {
           console.error('fetch points failed:', err);
+          setErrorFetch('Unable to load points. Please try again later.');
         } finally {
           setLoadingPoints(false);
         }
@@ -63,6 +71,9 @@ export default function LoyaltyDashboard() {
         setOtp(Array(6).fill(''));
         setLoadingPoints(false);
         setLoadingLogout(false);
+        setErrorSms('');
+        setErrorVerify('');
+        setErrorFetch('');
       }
     });
     return unsubscribe;
@@ -71,6 +82,7 @@ export default function LoyaltyDashboard() {
   // Send SMS
   const sendSms = async () => {
     setLoadingSms(true);
+    setErrorSms('');
     try {
       const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         size: 'invisible',
@@ -79,8 +91,9 @@ export default function LoyaltyDashboard() {
       setConfirmation(cr);
       // focus first input
       setTimeout(() => inputsRef.current[0]?.focus(), 300);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setErrorSms('Failed to send code. Please check your number and try again.');
     } finally {
       setLoadingSms(false);
     }
@@ -90,12 +103,17 @@ export default function LoyaltyDashboard() {
   const verifyCode = async () => {
     if (!confirmation) return;
     const code = otp.join('');
-    if (code.length < 6) return;
+    if (code.length < 6) {
+      setErrorVerify('Please enter the 6-digit code.');
+      return;
+    }
     setLoadingVerify(true);
+    setErrorVerify('');
     try {
       await confirmation.confirm(code);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Bad code', err);
+      setErrorVerify('Invalid code. Please try again.');
     } finally {
       setLoadingVerify(false);
     }
@@ -107,6 +125,9 @@ export default function LoyaltyDashboard() {
     try {
       await signOut(auth);
       router.refresh();
+    } catch (err) {
+      console.error(err);
+      // optionally show logout error toast
     } finally {
       setLoadingLogout(false);
     }
@@ -118,6 +139,7 @@ export default function LoyaltyDashboard() {
     const newOtp = [...otp];
     newOtp[idx] = value;
     setOtp(newOtp);
+    setErrorVerify('');
     if (value && idx < 5) {
       inputsRef.current[idx + 1]?.focus();
     }
@@ -130,11 +152,20 @@ export default function LoyaltyDashboard() {
     }
   };
 
-  // Loading spinner while fetching points
+  // Loading spinner while fetching points or error state
   if (loadingPoints) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-gray-400 opacity-75" />
+      </div>
+    );
+  }
+
+  // Show fetch error
+  if (errorFetch && !auth.currentUser) {
+    return (
+      <div className="p-4 text-red-600">
+        {errorFetch}
       </div>
     );
   }
@@ -159,6 +190,7 @@ export default function LoyaltyDashboard() {
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full p-2 border rounded-lg border-gray-300"
               />
+              {errorSms && <p className="text-red-600 text-sm">{errorSms}</p>}
               <Button
                 fullWidth
                 onClick={sendSms}
@@ -189,6 +221,7 @@ export default function LoyaltyDashboard() {
                   />
                 ))}
               </div>
+              {errorVerify && <p className="text-red-600 text-sm">{errorVerify}</p>}
               <Button
                 fullWidth
                 onClick={verifyCode}
