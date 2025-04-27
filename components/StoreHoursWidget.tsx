@@ -86,7 +86,7 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
     
            {/* show hours at md+ */}
            <span className="ml-1 text-x text-[#FFFFFF] hidden md:inline">
-             · {todayHours.split(',').join(' . ')}
+             · {todayHours.split(',').join(' | ')}
            </span>
          </div>
        );
