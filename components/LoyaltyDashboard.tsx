@@ -21,7 +21,7 @@ export default function LoyaltyDashboard() {
 
   // OTP state (6 digits)
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
-  const inputsRef = useRef<HTMLInputElement[]>([]);
+  const inputsRef = useRef<Array<HTMLInputElement | null>>(Array(6).fill(null));
 
   // Loading flags
   const [loadingSms, setLoadingSms] = useState(false);
@@ -126,12 +126,7 @@ export default function LoyaltyDashboard() {
   // Handler for key navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
     if (e.key === 'Backspace' && !otp[idx] && idx > 0) {
-      const prev = inputsRef.current[idx - 1];
-      setOtp(prev => {
-        const copy = [...prev]; copy[idx - 1] = '';
-        return copy;
-      });
-      prev?.focus();
+      inputsRef.current[idx - 1]?.focus();
     }
   };
 
@@ -167,7 +162,7 @@ export default function LoyaltyDashboard() {
               <Button
                 fullWidth
                 onClick={sendSms}
-                color="#d6112c"
+                color="#000000"
                 className="bg-white border border-gray-300 text-gray-900"
                 loading={loadingSms}
               >
@@ -183,7 +178,7 @@ export default function LoyaltyDashboard() {
                 {otp.map((digit, idx) => (
                   <input
                     key={idx}
-                    ref={el => (inputsRef.current[idx] = el!)}
+                    ref={(el) => { inputsRef.current[idx] = el; }}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
@@ -197,7 +192,7 @@ export default function LoyaltyDashboard() {
               <Button
                 fullWidth
                 onClick={verifyCode}
-                color="#d6112c"
+                color="#000000"
                 className="bg-white border border-gray-300 text-gray-900"
                 loading={loadingVerify}
               >
@@ -215,22 +210,12 @@ export default function LoyaltyDashboard() {
     <>
       <div id="recaptcha-container" />
       <div className="space-y-4 max-w-xs">
-        <div className="relative bg-gradient-to-tr from-gray to-gray-300 text-gray-1000 rounded-2xl p-6 shadow-lg min-h-[150px] flex flex-row justify-between  items-center gap-4">
-          
-          <div>
-            <p className="text-sm uppercase tracking-wide">Reward Points</p>
-            <h3 className="text-5xl font-semibold mt-1">{currentPoints}</h3>
-            <p className="mt-2 text-xs opacity-70">Updated {formattedDate}</p>
-          </div>
-          <div className="opacity-80 text-6xl">🎁</div>
+        <div className="relative bg-gradient-to-tr from-gray-100 to-gray-200 text-gray-900 rounded-2xl p-6 shadow-lg">
+          <div className="absolute top-4 right-4 opacity-10 text-6xl">🎁</div>
+          <p className="text-sm uppercase tracking-wide">Reward Points</p>
+          <h3 className="text-3xl font-semibold mt-1">{currentPoints}</h3>
+          <p className="mt-2 text-xs opacity-70">Updated {formattedDate}</p>
         </div>
-        <Button
-        fullWidth
-        variant='primary'
-        color='#d6112c'
-        >
-          Order Now
-        </Button>
         <Button
           fullWidth
           variant="outline"
