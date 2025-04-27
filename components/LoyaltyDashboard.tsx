@@ -1,151 +1,247 @@
-// components/LoyaltyDashboard.tsx
 'use client';
-
-import React, { useEffect, useState } from 'react';
-import Modal from './Modal';
+import React, { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/lib/firebase';
+import {
+  onAuthStateChanged,
+  signOut,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  ConfirmationResult,
+} from 'firebase/auth';
 import Button from './Button';
 
-interface LoyaltyDashboardProps {
-  /** Points needed to reach next tier/milestone */
-  nextTier: number;
-  /** Callback when points are redeemed; receives the amount redeemed */
-  onRedeem: (amount: number) => void;
-}
+export default function LoyaltyDashboard() {
+  const router = useRouter();
 
-/**
- * A dashboard that first asks for email (once), remembers it in localStorage,
- * then shows points, progress bar, redemption CTA, and allows logout.
- * Styled to match Balibu’s main color scheme.
- */
-const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ nextTier, onRedeem }) => {
-  const [email, setEmail] = useState('');
-  const [isVerified, setIsVerified] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Auth + data state
+  const [phone, setPhone] = useState('');
+  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const [currentPoints, setCurrentPoints] = useState(0);
-  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
 
-  const accent = '#d6112c';
-  const progressPct = Math.min((currentPoints / nextTier) * 100, 100);
+  // OTP state (6 digits)
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+  const inputsRef = useRef<HTMLInputElement[]>([]);
 
+  // Loading flags
+  const [loadingSms, setLoadingSms] = useState(false);
+  const [loadingVerify, setLoadingVerify] = useState(false);
+  const [loadingLogout, setLoadingLogout] = useState(false);
+  const [loadingPoints, setLoadingPoints] = useState(true);
+
+  // Format date for card
+  const formattedDate = new Date().toLocaleDateString(undefined, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  // Listen for auth changes & fetch points
   useEffect(() => {
-    const savedEmail = localStorage.getItem('loyaltyEmail');
-    const savedPoints = localStorage.getItem('loyaltyPoints');
-    if (savedEmail && savedPoints) {
-      setEmail(savedEmail);
-      setCurrentPoints(Number(savedPoints));
-      setIsVerified(true);
-    }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setLoadingLogout(false);
+        setLoadingPoints(true);
+        try {
+          const idToken = await user.getIdToken();
+          const res = await fetch('/api/points', {
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          setCurrentPoints(data.points);
+        } catch (err) {
+          console.error('fetch points failed:', err);
+        } finally {
+          setLoadingPoints(false);
+        }
+      } else {
+        // Reset on logout
+        setPhone('');
+        setConfirmation(null);
+        setCurrentPoints(0);
+        setOtp(Array(6).fill(''));
+        setLoadingPoints(false);
+        setLoadingLogout(false);
+      }
+    });
+    return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    if (isVerified && currentPoints >= nextTier) setShowMilestoneModal(true);
-  }, [isVerified, currentPoints, nextTier]);
-
-  const handleVerify = async () => {
-    setError(null);
+  // Send SMS
+  const sendSms = async () => {
+    setLoadingSms(true);
     try {
-      const res = await fetch('/api/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
       });
-      if (!res.ok) throw new Error('Failed to verify');
-      const { points } = await res.json();
-      setCurrentPoints(points);
-      setIsVerified(true);
-      localStorage.setItem('loyaltyEmail', email);
-      localStorage.setItem('loyaltyPoints', String(points));
-    } catch (err: any) {
-      setError(err.message);
+      const cr = await signInWithPhoneNumber(auth, phone, verifier);
+      setConfirmation(cr);
+      // focus first input
+      setTimeout(() => inputsRef.current[0]?.focus(), 300);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingSms(false);
     }
   };
 
-  const handleRedeem = () => {
-    onRedeem(currentPoints);
-    const remaining = Math.max(currentPoints - nextTier, 0);
-    setCurrentPoints(remaining);
-    localStorage.setItem('loyaltyPoints', String(remaining));
+  // Verify code
+  const verifyCode = async () => {
+    if (!confirmation) return;
+    const code = otp.join('');
+    if (code.length < 6) return;
+    setLoadingVerify(true);
+    try {
+      await confirmation.confirm(code);
+    } catch (err) {
+      console.error('Bad code', err);
+    } finally {
+      setLoadingVerify(false);
+    }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('loyaltyEmail');
-    localStorage.removeItem('loyaltyPoints');
-    setEmail('');
-    setCurrentPoints(0);
-    setIsVerified(false);
-    setError(null);
+  // Logout
+  const handleLogout = async () => {
+    setLoadingLogout(true);
+    try {
+      await signOut(auth);
+      router.refresh();
+    } finally {
+      setLoadingLogout(false);
+    }
   };
 
-  if (!isVerified) {
+  // Handler for OTP input change
+  const handleOtpChange = (value: string, idx: number) => {
+    if (!/^[0-9]?$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[idx] = value;
+    setOtp(newOtp);
+    if (value && idx < 5) {
+      inputsRef.current[idx + 1]?.focus();
+    }
+  };
+
+  // Handler for key navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
+    if (e.key === 'Backspace' && !otp[idx] && idx > 0) {
+      const prev = inputsRef.current[idx - 1];
+      setOtp(prev => {
+        const copy = [...prev]; copy[idx - 1] = '';
+        return copy;
+      });
+      prev?.focus();
+    }
+  };
+
+  // Loading spinner while fetching points
+  if (loadingPoints) {
     return (
-      <div className="bg-[#F2EAE2] rounded-2xl p-4 space-y-4 max-w-xs border border-[#d6112c]">
-        <h3 className="text-lg font-semibold text-[#24333F]">Loyalty Login</h3>
-        <input
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg"
-        />
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <Button
-          fullWidth
-          onClick={handleVerify}
-          color={accent}
-          className={`${!email && 'opacity-50 pointer-events-none'}`}
-        >
-          Verify
-        </Button>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-gray-400 opacity-75" />
       </div>
     );
   }
 
+  // Login view: mobile verification instructions
+  if (!auth.currentUser) {
+    return (
+      <>
+        <div id="recaptcha-container" />
+        <div className="bg-white rounded-2xl p-4 space-y-4 max-w-xs border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Mobile Verification</h3>
+          <p className="text-sm text-gray-600">
+            Enter your mobile number below to receive a verification code. Once verified, you'll be able to view your loyalty points.
+          </p>
+
+          {!confirmation ? (
+            <>
+              <input
+                type="tel"
+                placeholder="e.g. +1 650-555-1234"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full p-2 border rounded-lg border-gray-300"
+              />
+              <Button
+                fullWidth
+                onClick={sendSms}
+                color="#d6112c"
+                className="bg-white border border-gray-300 text-gray-900"
+                loading={loadingSms}
+              >
+                Send Verification Code
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-gray-600">
+                We’ve sent a code to <span className="font-medium">{phone}</span>. Enter it below to continue.
+              </p>
+              <div className="flex space-x-2 justify-center">
+                {otp.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    ref={el => (inputsRef.current[idx] = el!)}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={e => handleOtpChange(e.target.value, idx)}
+                    onKeyDown={e => handleKeyDown(e, idx)}
+                    className="w-10 h-10 text-center border rounded-lg border-gray-300"
+                  />
+                ))}
+              </div>
+              <Button
+                fullWidth
+                onClick={verifyCode}
+                color="#d6112c"
+                className="bg-white border border-gray-300 text-gray-900"
+                loading={loadingVerify}
+              >
+                Verify Code
+              </Button>
+            </>
+          )}
+        </div>
+      </>
+    );
+  }
+
+  // Dashboard view as sleek Apple-style card
   return (
-    <div className="bg-[#F2EAE2] rounded-2xl p-6 space-y-6 max-w-xs border border-[#d6112c]">
-      <h3 className="text-xl font-semibold text-[#24333F]">Your Loyalty</h3>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white p-3 rounded-lg text-center">
-          <p className="text-2xl font-bold text-[#d6112c]">{currentPoints}</p>
-          <p className="text-sm text-[#24333F]">Points</p>
+    <>
+      <div id="recaptcha-container" />
+      <div className="space-y-4 max-w-xs">
+        <div className="relative bg-gradient-to-tr from-gray to-gray-300 text-gray-1000 rounded-2xl p-6 shadow-lg min-h-[150px] flex flex-row justify-between  items-center gap-4">
+          
+          <div>
+            <p className="text-sm uppercase tracking-wide">Reward Points</p>
+            <h3 className="text-5xl font-semibold mt-1">{currentPoints}</h3>
+            <p className="mt-2 text-xs opacity-70">Updated {formattedDate}</p>
+          </div>
+          <div className="opacity-80 text-6xl">🎁</div>
         </div>
-        <div className="bg-white p-3 rounded-lg text-center">
-          <p className="text-2xl font-bold text-[#24333F]">{Math.max(nextTier - currentPoints, 0)}</p>
-          <p className="text-sm text-[#24333F]">To Next</p>
-        </div>
-      </div>
-
-      <div className="space-y-1">
-        <p className="text-sm text-[#4A5058]">Progress</p>
-        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-          <div
-            className="h-full"
-            style={{ width: `${progressPct}%`, backgroundColor: accent }}
-          />
-        </div>
-      </div>
-
-      <div className="flex space-x-2">
-        <Button fullWidth onClick={handleRedeem} color={accent} className="text-sm">
-          Redeem
+        <Button
+        fullWidth
+        variant='primary'
+        color='#d6112c'
+        >
+          Order Now
         </Button>
-        <Button fullWidth variant="outline" color={accent} className="text-sm">
+        <Button
+          fullWidth
+          variant="outline"
+          onClick={handleLogout}
+          color="#4B5563"
+          className="text-sm border-gray-300"
+          loading={loadingLogout}
+        >
           Logout
         </Button>
       </div>
-
-      <Modal
-        open={showMilestoneModal}
-        title="Congrats!"
-        bgColor="#FFFFFF"
-        textColor="#000"
-        width="280px"
-        onClose={() => setShowMilestoneModal(false)}
-      >
-        <p className="text-center text-[#24333F]">{`You've reached ${nextTier} points!`}</p>
-      </Modal>
-    </div>
+    </>
   );
-};
-
-export default LoyaltyDashboard;
+}

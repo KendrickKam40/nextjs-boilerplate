@@ -13,6 +13,7 @@ interface ButtonProps {
   /** Additional Tailwind CSS classes */
   className?: string;
   color?: string;
+  loading?: boolean;
 }
 
 /**
@@ -25,8 +26,9 @@ const Button: React.FC<ButtonProps> = ({
     onClick,
     className = '',
     color = '#F33550',
+    loading = false,
   }) => {
-    const base = 'font-bold py-3 px-6 rounded-lg focus:outline-none transition cursor-pointer';
+    const base = 'font-bold py-3 px-6 rounded-lg focus:outline-none transition cursor-pointer flex items-center justify-center';
     const widthClass = fullWidth ? 'w-full' : '';
     
     // Determine inline styles based on variant
@@ -41,7 +43,31 @@ const Button: React.FC<ButtonProps> = ({
         className={`${base} ${widthClass} ${className}`}
         style={styleProps}
       >
-        {children}
+        {loading
+        ? (
+          <svg
+            className="animate-spin h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+        )
+        : children
+      }
       </button>
     );
   };

@@ -66,7 +66,7 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
 
   const { openTimes, openStatus } = data!;
   const now = new Date();
-  const todayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+  const todayName = now.toLocaleDateString('en-AU', { weekday: 'long' });
   const todayHours = openTimes[todayName] || 'Closed';
   const isOpen = openStatus === 1;
 
