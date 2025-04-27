@@ -16,6 +16,7 @@ async function proxyClient() {
   );
   if (!res.ok) throw new Error('Upstream error ' + res.status);
   const { client } = await res.json();
+  console.log('client', client);  
   return client;
 }
 

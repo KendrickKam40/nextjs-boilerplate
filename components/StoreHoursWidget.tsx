@@ -39,7 +39,7 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
   if (compact) {
     if (loading || error || !data) {
       return (
-        <div className="flex items-center space-x-1 text-xs text-[#4A5058] opacity-50">
+        <div className="flex items-center space-x-1 text-xs text-[#FFFFFF] opacity-100">
           <Clock className="h-4 w-4 animate-pulse" />
           <span>…</span>
         </div>
@@ -72,7 +72,7 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
 
   if (compact) {
        return (
-         <div className="flex items-center text-[#24333F]">
+         <div className="flex items-center text-[#FFFFFF]">
            {/* always show just the clock & status text on xs */}
            <Clock
              className={`h-4 w-4 ${
@@ -80,12 +80,12 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
              }`}
            />
     
-           <span className="ml-1 text-xs font-medium">
+           <span className="ml-1 text-s font-medium">
              {isOpen ? 'Open' : 'Closed'}
            </span>
     
            {/* show hours at md+ */}
-           <span className="ml-1 text-xs text-[#4A5058] hidden md:inline">
+           <span className="ml-1 text-x text-[#FFFFFF] hidden md:inline">
              · {todayHours}
            </span>
          </div>

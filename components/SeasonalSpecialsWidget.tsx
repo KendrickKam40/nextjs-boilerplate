@@ -3,35 +3,65 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Star, Loader2 } from 'lucide-react';
+import { Loader2, Star } from 'lucide-react';
 
-interface ClientData {
+interface ClientResponse {
   coverImage: string;
 }
 
-/**
- * Client Component: fetches client.coverImage and displays
- * it with a dynamic “TODAY’S SPECIAL” banner.
- */
+interface MenuResponse {
+  menuItems: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    price: number;
+    showCase: boolean;
+    order: number;
+  }>;
+}
+
+interface Special {
+  name: string;
+  description: string;
+  price: string;
+}
+
 export default function SeasonalSpecialsWidget() {
   const [coverImage, setCoverImage] = useState<string>('');
-  const [dayName, setDayName] = useState<string>('');
+  const [specials, setSpecials] = useState<Special[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function load() {
+    async function loadData() {
       try {
-        const res = await fetch('/api/client');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as ClientData;
-        setCoverImage(data.coverImage);
+        // Fetch client metadata and menu items in parallel
+        const [clientRes, menuRes] = await Promise.all([
+          fetch('/api/client'),
+          fetch('/api/menu'),
+        ]);
 
-        const now = new Date();
-        const weekday = now
-          .toLocaleDateString('en-US', { weekday: 'long' })
-          .toUpperCase();
-        setDayName(weekday);
+        if (!clientRes.ok) throw new Error(`Client error: ${clientRes.status}`);
+        if (!menuRes.ok) throw new Error(`Menu error: ${menuRes.status}`);
+
+        const clientData = (await clientRes.json()) as ClientResponse;
+        const menuData = (await menuRes.json()) as MenuResponse;
+
+        // Set the banner image
+        setCoverImage(clientData.coverImage);
+
+        // Filter for showCase items, sort by `order`, and take the first four
+        const featured = menuData.menuItems
+          .filter(item => item.showCase)
+          .sort((a, b) => a.order - b.order)
+          .slice(0, 4)
+          .map(item => ({
+            name: item.name,
+            description: (item.description || '').trim(),
+            price: `$${item.price.toFixed(2)}`,
+          }));
+
+        setSpecials(featured);
       } catch (err: any) {
         console.error(err);
         setError(err.message);
@@ -39,12 +69,13 @@ export default function SeasonalSpecialsWidget() {
         setLoading(false);
       }
     }
-    load();
+
+    loadData();
   }, []);
 
   if (loading) {
     return (
-      <div className="bg-[#F2EAE2] p-6 rounded-2xl w-full border border-[#EAE0DA] flex flex-col items-center justify-center space-y-2">
+      <div className="bg-white p-6 w-full flex flex-col items-center justify-center space-y-2">
         <Loader2 className="h-6 w-6 text-[#d6112c] animate-spin" />
         <span className="text-[#4A5058]">Loading specials…</span>
       </div>
@@ -53,7 +84,7 @@ export default function SeasonalSpecialsWidget() {
 
   if (error) {
     return (
-      <div className="bg-[#F2EAE2] p-6 rounded-2xl w-full border border-[#EAE0DA] flex flex-col items-center justify-center space-y-2">
+      <div className="bg-white p-6 w-full flex flex-col items-center justify-center space-y-2">
         <Star className="h-6 w-6 text-[#EF4444]" />
         <span className="text-[#EF4444]">Error: {error}</span>
       </div>
@@ -61,24 +92,43 @@ export default function SeasonalSpecialsWidget() {
   }
 
   return (
-    <div className="bg-[#F2EAE2] rounded-2xl w-full border border-[#EAE0DA] overflow-hidden shadow-md">
-      {/* Header */}
-      <div className="flex items-center space-x-2 px-6 py-4">
-        <Star className="h-5 w-5 text-[#d6112c]" />
-        <h4 className="text-lg font-semibold text-[#24333F]">
-          TODAY’S SPECIAL: <span className="uppercase text-[#d6112c]">{dayName}</span>
-        </h4>
-      </div>
-
-      {/* Cover Image */}
-      <div className="relative h-56 w-full">
-        <Image
-          src={coverImage}
-          alt="Seasonal special cover"
-          fill
-          className="object-cover"
-          priority
-        />
+    <div className="bg-white w-full overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+        {/* LEFT: Title & List */}
+        <div className="space-y-4">
+          <h4 className="text-lg font-semibold text-[#24333F]">
+            Check out our{' '}
+            <span className="block text-2xl font-serif">Seasonal Offers</span>
+          </h4>
+          <div className="space-y-4">
+            {specials.map((item, i) => (
+              <div
+                key={i}
+                className={`flex justify-between items-start ${
+                  i < specials.length - 1 ? 'border-b border-[#EAE0DA] pb-4' : ''
+                }`}
+              >
+                <div className="pr-4">
+                  <p className="text-[#24333F] font-medium">{item.name}</p>
+                  {item.description && (
+                    <p className="text-[#4A5058] text-sm">{item.description}</p>
+                  )}
+                </div>
+                <p className="text-[#24333F] font-medium">{item.price}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* RIGHT: Cover Image */}
+        <div className="relative w-full h-56 sm:h-64 lg:h-full lg:pl-12 rounded-2xl overflow-hidden shadow-md">
+          <Image
+            src={coverImage}
+            alt="Seasonal special cover"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
       </div>
     </div>
   );
