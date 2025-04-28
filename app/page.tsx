@@ -59,7 +59,7 @@ export default function HomePage() {
               alt="Balibu Logo"
               width={100}
               height={100}
-              className="object-contain"
+              className="object-contain -rotate-15"
             />
 
             {/* Icons & Menu */}
