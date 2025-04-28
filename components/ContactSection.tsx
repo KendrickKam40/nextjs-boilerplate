@@ -77,12 +77,12 @@ export default function ContactSection() {
               <h3 className="text-xl font-medium text-[#24333F] mb-2">
                 Store Hours
               </h3>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm lg:grid-cols-2">
                 {WEEKDAYS.map(day => {
                   const times = openTimes[day]?.split(',') || [];
                   return (
                     <div key={day} className="flex justify-between">
-                      <span className="font-medium text-[#24333F]">{day}</span>
+                      <span className="font-medium text-[#24333F] font-black">{day}</span>
                       <span className="text-[#4A5058]">
                         {times.map((t, i) => (
                           <span key={i} className="block">

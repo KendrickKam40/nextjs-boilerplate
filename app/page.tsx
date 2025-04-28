@@ -130,7 +130,7 @@ export default function HomePage() {
           <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
             <div className="relative w-full h-64 lg:h-96 rounded-2xl overflow-hidden shadow-md">
               <Image
-                src="/menu/bowl.jpg"
+                src="/menu/smoothie.jpg"
                 alt="Our history"
                 fill
                 className="object-cover"
