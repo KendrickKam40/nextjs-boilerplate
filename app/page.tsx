@@ -25,15 +25,21 @@ export default function HomePage() {
   const [primaryColor, setPrimaryColor] = useState<string>('#d6112c');
   const [secondaryColor, setSecondaryColor] = useState('#9a731e');
 
+  // BG IMAGE
+  const [bgImage, setBgImage] = useState<string>('/HeroBackground.webp');
+
   // Fetch primaryColor from API and convert ARGB → CSS hex
   useEffect(() => {
     async function loadTheme() {
       try {
         const res = await fetch('/api/client');
         if (!res.ok) return;
-        const { primaryColor: rawPrimary , secondaryColor: rawSecondary } =  (await res.json()) as { primaryColor: string; secondaryColor: string };
+        const { primaryColor: rawPrimary , secondaryColor: rawSecondary , bgImage: bgImage} =  (await res.json()) as { primaryColor: string; secondaryColor: string , bgImage: string };
         setPrimaryColor('#' + rawPrimary.substring(rawPrimary.length - 6));
         setSecondaryColor('#' + rawSecondary.slice(-6));
+        setBgImage(bgImage);
+
+        console.log('BGIMG' ,bgImage);
       } catch {
         // keep default
       }
@@ -81,7 +87,8 @@ export default function HomePage() {
           {/* Background image & overlay */}
           <div className="absolute inset-0">
             <Image
-              src="/HeroBackground.webp"
+              // src="/HeroBackground.webp"
+              src={bgImage}
               alt="Hero background"
               fill
               className="object-cover"

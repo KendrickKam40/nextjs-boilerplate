@@ -11,6 +11,7 @@ if (!getApps().length) {
       // Make sure FIREBASE_SERVICE_ACCOUNT contains the JSON string of your service account
       JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!)
     ),
+    
   });
 }
 
@@ -22,10 +23,21 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    console.log('Verifying token', idToken);
     const decoded = await getAuth().verifyIdToken(idToken);
     const uid = decoded.uid;
 
-    // lookup actual points…
+    console.log('Decoded token', decoded);
+
+    // lookup actual point using Firebase API
+    // https://firestore.googleapis.com/v1/$docPath/projects/$projectId/databases/(default)/documents/Clients/$companyId/Loyalty/$uid
+    // headers: {
+    //   'Authorization': 'Bearer $idToken',
+    //   'Content-Type': 'application/json',
+    // },
+    // final docPath =
+    //   'projects/$projectId/databases/(default)/documents/Clients/$companyId/Loyalty/$uid';
+
     const points = 100;
     return NextResponse.json({ points }, { status: 200 });
 
