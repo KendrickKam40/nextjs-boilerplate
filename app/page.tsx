@@ -13,6 +13,7 @@ import Menu, { MenuOption } from '@/components/Menu';
 import LoyaltyDashboard from '@/components/LoyaltyDashboard';
 import SeasonalSpecialsWidget from '@/components/SeasonalSpecialsWidget';
 import ContactSection from '@/components/ContactSection';
+import { app } from 'firebase-admin';
 
 const StoreHoursWidget = dynamic(
   () => import('@/components/StoreHoursWidget'),
@@ -29,6 +30,7 @@ interface ClientResponse {
   address: string;
   companyNumber: string;
   openTimes: Record<string, string>;
+  appDescription: string; // Optional field for app description
   // …include any other fields returned by /api/client
 }
 
@@ -60,6 +62,8 @@ export default function HomePage() {
   // aboutUs
   const [aboutUs, setAboutUs] = useState<string>('');
 
+  // 
+  const [appDescription, setAppDescription] = useState<string>('');
 
   // bookingAccess
   const [bookingAccess, setBookingAccess] = useState<boolean>(false);
@@ -123,6 +127,7 @@ export default function HomePage() {
         setBgImage(clientJson.bgImage);
         setAboutUs(clientJson.aboutUs);
         setBookingAccess(clientJson.bookingAccess);
+        setAppDescription(clientJson.appDescription || ''); // Set app description if available
 
         setClientData(clientJson);
         setMenuData(menuJson);
@@ -341,24 +346,15 @@ export default function HomePage() {
           <div className="space-y-4">
             <div className="relative w-full h-40 sm:h-60 overflow-hidden rounded-2xl">
               <Image
-                src="/menu/bowl.jpg"
-                alt="Signature bowl"
+                src={bgImage}
+                alt="bgImage"
                 fill
                 className="object-cover"
               />
             </div>
-            <div className="space-y-2 text-sm sm:text-base text-[#24333F] max-h-[60vh] overflow-y-auto">
+            <div className="space-y-2 text-sm sm:text-base text-[#24333F] max-h-[60vh] overflow-y-auto text-center">
               <p>
-                Founded in 2022 by lifelong friends with a shared passion for vibrant flavors and mindful dining, Balibu was born from the simple idea that good food should nourish both body and soul. Inspired by the bold spices of Indonesia and the laid-back cool of coastal vibes, we’ve crafted an IndoFusion menu where every dish feels like a celebration of fresh ingredients and soulful tradition.
-              </p>
-              <p>
-                From our very first day, we set out not just to serve meals, but to build a community. Whether you’re dropping in for a quick lunch or gathering with friends for an evening feast, we want every visit to feel effortless, intuitive, and—most importantly—deliciously memorable. That’s why we’ve invested in seamless ordering technology, so you can place an order in seconds from your favorite device, and why our loyalty program makes it easy to earn rewards every time you dine.
-              </p>
-              <p>
-                Behind the scenes, our kitchen team works with precision and care. Orders flow through our digital system straight to the chefs, ensuring that every bowl, roll, and plate reaches you at peak flavor and freshness. And as your tastes evolve, our menu adapts—bringing you seasonal specials that highlight the very best of each harvest.
-              </p>
-              <p>
-                At Balibu, we believe great food starts with great relationships. From the farmers who grow our produce, to the friendly faces you see when you walk through our door, we’re united by a commitment to quality, speed, and genuine hospitality. Thank you for being part of our journey—here’s to many more shared moments and mouthwatering meals ahead.
+                {appDescription}
               </p>
             </div>
           </div>
