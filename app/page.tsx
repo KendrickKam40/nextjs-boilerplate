@@ -221,7 +221,7 @@ export default function HomePage() {
           <div className="relative max-w-6xl mx-auto flex flex-col-reverse lg:flex-row items-center px-4 py-12 sm:py-20">
             {/* Text & StoreHours */}
             <div className="w-full lg:w-1/2 space-y-4 lg:pr-16 text-white text-center lg:text-left">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white">
                 IndoFusion Made Effortless
               </h1>
               <div className='flex justify-center lg:justify-start'>
