@@ -1,10 +1,9 @@
 // app/page.tsx
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Star } from 'lucide-react';
 
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
@@ -13,7 +12,6 @@ import Menu, { MenuOption } from '@/components/Menu';
 import LoyaltyDashboard from '@/components/LoyaltyDashboard';
 import SeasonalSpecialsWidget from '@/components/SeasonalSpecialsWidget';
 import ContactSection from '@/components/ContactSection';
-import { app } from 'firebase-admin';
 
 const StoreHoursWidget = dynamic(
   () => import('@/components/StoreHoursWidget'),
@@ -31,6 +29,9 @@ interface ClientResponse {
   companyNumber: string;
   openTimes: Record<string, string>;
   appDescription: string; // Optional field for app description
+  logoImage: string; // Optional field for logo image
+  kioskMessage?: string; // Optional field for kiosk message
+  announceTitle?: string; // Optional field for announcement title
   // …include any other fields returned by /api/client
 }
 
@@ -56,6 +57,9 @@ export default function HomePage() {
   const [primaryColor, setPrimaryColor] = useState<string>('#d6112c');
   const [secondaryColor, setSecondaryColor] = useState('#9a731e');
 
+  // Logo Image
+  const [logoImage, setLogoImage] = useState<string>('/BalibuLogoLight.png');
+
   // BG IMAGE
   const [bgImage, setBgImage] = useState<string>('');
 
@@ -71,41 +75,6 @@ export default function HomePage() {
   const [clientData, setClientData] = useState<ClientResponse | null>(null);
   const [menuData, setMenuData] = useState<MenuResponse | null>(null);
 
-
-
-  // // Fetch primaryColor from API and convert ARGB → CSS hex
-  // useEffect(() => {
-  //   async function loadTheme() {
-  //     try {
-  //       const res = await fetch('/api/client', {
-  //         next: {
-  //           revalidate: 3600, // 1 hour
-  //         },
-  //       });
-  //       if (!res.ok) return;
-  //       const { primaryColor: rawPrimary, secondaryColor: rawSecondary, bgImage: bgImage , aboutUs: aboutUs, bookingAccess: bookingAccess} =
-  //         (await res.json()) as {
-  //           primaryColor: string;
-  //           secondaryColor: string;
-  //           bgImage: string;
-  //           aboutUs: string;
-  //           bookingAccess: boolean;
-  //         };
-
-  //       setPrimaryColor('#' + rawPrimary.substring(rawPrimary.length - 6));
-  //       setSecondaryColor('#' + rawSecondary.slice(-6));
-  //       setBgImage(bgImage);
-  //       setAboutUs(aboutUs); // Set aboutUs if available
-  //       setBookingAccess(bookingAccess); // Default to false if not provided
-  //     } catch {
-  //       // keep default values if the fetch fails
-  //     } finally {
-  //       // Regardless of success or failure, stop showing the page-loading skeleton
-  //       setIsPageLoading(false);
-  //     }
-  //   }
-  //   loadTheme();
-  // }, []);
 
   useEffect(() => {
     async function loadInitialData() {
@@ -128,7 +97,7 @@ export default function HomePage() {
         setAboutUs(clientJson.aboutUs);
         setBookingAccess(clientJson.bookingAccess);
         setAppDescription(clientJson.appDescription || ''); // Set app description if available
-
+        setLogoImage(clientJson.logoImage); // Fallback to default logo if not provided
         setClientData(clientJson);
         setMenuData(menuJson);
       } catch (err) {
@@ -140,6 +109,13 @@ export default function HomePage() {
     }
     loadInitialData();
   }, []);
+
+  // Choose a single ticker phrase (Staays-style)
+  const tickerPhrase = useMemo(() => {
+    const fromApi = clientData?.kioskMessage || clientData?.announceTitle || '';
+    const fallback = 'Fresh Local Meets Indonesian Spice';
+    return (fromApi && fromApi.trim().length > 0) ? fromApi.trim() : fallback;
+  }, [clientData]);
 
   // Reset background image loading state when bgImage changes
   useEffect(() => {
@@ -177,14 +153,7 @@ export default function HomePage() {
         {/* ─── HEADER ───────────────────────────────────────────────────────── */}
         <header className="absolute inset-x-0 top-0 z-50">
           <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-4 sm:py-6">
-            {/* Logo */}
-            <Image
-              src="/BalibuLogoLight.png"
-              alt="Balibu Logo"
-              width={100}
-              height={100}
-              className="object-contain -rotate-15"
-            />
+            <div></div>
 
             {/* Icons & Menu */}
             <div className="flex items-center space-x-4">
@@ -203,74 +172,85 @@ export default function HomePage() {
         {/* ─── HERO ──────────────────────────────────────────────────────────── */}
         <section className="relative w-full pt-20 pb-10">
           {/* Background image & overlay */}
-          <div className="absolute inset-0">
-          {/* Placeholder while the real image loads */}
-          {!isBgLoaded && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-              {/* Optional: a simple spinner could be placed here */}
-            </div>
-          )}
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Placeholder while the real image loads */}
+            {!isBgLoaded && (
+              <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center" />
+            )}
 
-          <Image
-            src={bgImage}
-            alt="Hero background"
-            fill
-            className={`object-cover transition-opacity duration-500 ${isBgLoaded ? 'opacity-100' : 'opacity-0'}`}
-            priority
-            onLoadingComplete={() => setIsBgLoaded(true)}
-          />
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
+            {/* Animated wrapper so transforms apply reliably */}
+            <div className={`absolute inset-0 transition-opacity duration-500 kenburns ${isBgLoaded ? 'opacity-100' : 'opacity-0'}`}>
+              <Image
+                src={bgImage}
+                alt="Hero background"
+                fill
+                className="object-cover"
+                priority
+                onLoadingComplete={() => setIsBgLoaded(true)}
+              />
+            </div>
+
+            <div className="absolute inset-0 bg-black/60" />
+          </div>
 
           {/* Content */}
-          <div className="relative max-w-6xl mx-auto flex flex-col-reverse lg:flex-row items-center px-4 py-12 sm:py-20">
-            {/* Text & StoreHours */}
-            <div className="w-full lg:w-1/2 space-y-4 lg:pr-16 text-white text-center lg:text-left">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold banner">
-                IndoFusion Made Effortless
-              </h1>
-              <div className='flex justify-center lg:justify-start'>
-                <StoreHoursWidget compact />
-              </div>
-              
-              <div className="flex justify-center lg:justify-start space-x-4">
-                <Button 
-                color={primaryColor} 
-                className="py-2 px-12 text-sm"
-                onClick={() => setActiveModal('order')}
+          <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 flex flex-col items-center text-white text-center gap-6">
+            <div className="w-full max-w-2xl mx-auto space-y-6">
+              <Image
+                src="/BalibuLogoLight.png"
+                alt="Balibu Logo"
+                width={400}
+                height={400}
+                className="object-contain mx-auto w-full max-w-[400px] h-auto"
+              />
+
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+                <Button
+                  color={primaryColor}
+                  className="py-2 px-12 text-sm"
+                  onClick={() => setActiveModal('order')}
                 >
                   Order Online
                 </Button>
-              {bookingAccess && (
-                <Button
-                  variant="outline"
-                  color={secondaryColor}
-                  className="py-2 px-12 text-sm"
-                  onClick={() => setActiveModal('booking')}
-                >
-                  Book Online
-                </Button>
-              )}
+                {bookingAccess && (
+                  <Button
+                    variant="outline"
+                    color={secondaryColor}
+                    className="py-2 px-12 text-sm"
+                    onClick={() => setActiveModal('booking')}
+                  >
+                    Book Online
+                  </Button>
+                )}
               </div>
-            </div>
 
-            {/* Hero graphic: centered on mobile, right-aligned on lg+ */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end mb-8 lg:mb-0">
-              <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-100 md:h-100 lg:w-120 lg:h-120">
-                <Image
-                  src="/FeatureImage.png"
-                  alt="Hero graphic"
-                  fill
-                  className="object-contain"
-                  priority
-                />
+              <div className='flex justify-center'>
+                <StoreHoursWidget compact />
               </div>
             </div>
           </div>
+          <style jsx>{`
+@keyframes kenburns {
+  0%   { transform: scale(1) translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: scale(1.14) translate3d(0, -2.5%, 0) rotate(0.25deg); }
+  100% { transform: scale(1.28) translate3d(0, -5%, 0) rotate(0.5deg); }
+}
+.kenburns {
+  animation: kenburns 40s ease-in-out infinite alternate;
+  transform-origin: center center;
+  will-change: transform;
+}
+@media (max-width: 640px) {
+  .kenburns { animation-duration: 32s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kenburns { animation: none; }
+}
+          `}</style>
         </section>
 
         {/* ─── SCROLLING BANNER ───────────────────────────────────────────────── */}
-        <Ticker />
+        <Ticker phrase={tickerPhrase} />
 
 
         {/* ─── OUR STORY ────────────────────────────────────────────────────── */}
@@ -307,16 +287,6 @@ export default function HomePage() {
             menuItems={menuData.menuItems}
           />
         )}
-
-        {/* ─── FOR LUNCH ─────────────────────────────────────────────────────
-        <section id="menu" className="max-w-6xl mx-auto text-center my-12 sm:my-16 px-4 space-y-6">
-          <h3 className="text-xl font-semibold text-[#24333F]">For Lunch</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-          </div>
-          <Button variant="outline" color={primaryColor} className="py-2 px-6">
-            Full menu
-          </Button>
-        </section> */}
 
         {clientData && (
           <div id="contact" className="max-w-6xl mx-auto my-12 sm:my-16 px-4 space-y-6">

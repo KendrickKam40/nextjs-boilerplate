@@ -1,12 +1,7 @@
 {/* ─── SCROLLING BANNER (SEAMLESS) ───────────────────────────────────── */}
-export default function Ticker() {
-  const items = [
-    'SAVOUR INDOFUSION BOWLS',
-    'ORDER ONLINE NOW',
-    'SEASONAL SPECIALS',
-  ];
-  // Duplicate items so each half of the track is comfortably wider than the viewport
-  const looped = Array(4).fill(items).flat();
+export default function Ticker({ phrase }: { phrase: string }) {
+  const base = (phrase || '').trim();
+  const looped = Array(12).fill(base);
 
   return (
     <div className="relative overflow-hidden border-y border-[#EAE0DA] bg-white py-6">
@@ -15,7 +10,7 @@ export default function Ticker() {
         <div className="ticker-group" aria-hidden="false">
           {looped.map((t, i) => (
             <span key={`a-${i}`} className="ticker-item">
-              {t}
+              {t} •
             </span>
           ))}
         </div>
@@ -23,7 +18,7 @@ export default function Ticker() {
         <div className="ticker-group" aria-hidden="true">
           {looped.map((t, i) => (
             <span key={`b-${i}`} className="ticker-item">
-              {t}
+              {t} •
             </span>
           ))}
         </div>
@@ -33,7 +28,7 @@ export default function Ticker() {
         .ticker-track {
           display: flex;
           width: max-content;         /* size to content (two groups) */
-          animation: ticker 36s linear infinite;
+          animation: ticker 120s linear infinite;
           will-change: transform;
         }
 
@@ -48,11 +43,10 @@ export default function Ticker() {
 
         .ticker-item {
           text-transform: uppercase;
-          letter-spacing: 0.2em;
           font-weight: 700;
           line-height: 1;             /* avoid vertical overlap */
           color: #d6112c;
-          font-size: 1.3em;
+          font-size: 1.6em;
         }
 
         @keyframes ticker {
