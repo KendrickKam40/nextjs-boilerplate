@@ -201,7 +201,7 @@ export default function HomePage() {
                 alt="Balibu Logo"
                 width={400}
                 height={400}
-                className="object-contain mx-auto w-full max-w-[400px] h-auto"
+                className="object-contain mx-auto w-full max-w-[300px] sm:max-w-[400px] h-auto sm:max-h-none max-h-[200px]"
               />
 
               <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
@@ -265,7 +265,7 @@ export default function HomePage() {
             {/* Prominent image with rounded corners and shadow */}
             <div className="relative mx-auto w-full h-64 sm:h-72 md:h-80 rounded-2xl overflow-hidden shadow-md">
               <Image
-                src="/menu/smoothie.jpg"
+                src="/OURSTORY_Pic.jpg"
                 alt="Our history"
                 fill
                 className="object-cover"
@@ -316,7 +316,7 @@ export default function HomePage() {
           <div className="space-y-4">
             <div className="relative w-full h-40 sm:h-60 overflow-hidden rounded-2xl">
               <Image
-                src={bgImage}
+                src="/OURSTORY_Pic.jpg"
                 alt="bgImage"
                 fill
                 className="object-cover"
