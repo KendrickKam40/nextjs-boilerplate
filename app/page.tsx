@@ -230,21 +230,30 @@ export default function HomePage() {
             </div>
           </div>
           <style jsx>{`
+@-webkit-keyframes kenburns {
+  0%   { -webkit-transform: scale(1) translate3d(0,0,0) rotate(0deg); transform: scale(1) translate3d(0,0,0) rotate(0deg); }
+  50%  { -webkit-transform: scale(1.14) translate3d(0,-2.5%,0) rotate(0.25deg); transform: scale(1.14) translate3d(0,-2.5%,0) rotate(0.25deg); }
+  100% { -webkit-transform: scale(1.28) translate3d(0,-5%,0) rotate(0.5deg); transform: scale(1.28) translate3d(0,-5%,0) rotate(0.5deg); }
+}
 @keyframes kenburns {
-  0%   { transform: scale(1) translate3d(0, 0, 0) rotate(0deg); }
-  50%  { transform: scale(1.14) translate3d(0, -2.5%, 0) rotate(0.25deg); }
-  100% { transform: scale(1.28) translate3d(0, -5%, 0) rotate(0.5deg); }
+  0%   { -webkit-transform: scale(1) translate3d(0,0,0) rotate(0deg); transform: scale(1) translate3d(0,0,0) rotate(0deg); }
+  50%  { -webkit-transform: scale(1.14) translate3d(0,-2.5%,0) rotate(0.25deg); transform: scale(1.14) translate3d(0,-2.5%,0) rotate(0.25deg); }
+  100% { -webkit-transform: scale(1.28) translate3d(0,-5%,0) rotate(0.5deg); transform: scale(1.28) translate3d(0,-5%,0) rotate(0.5deg); }
 }
 .kenburns {
+  -webkit-animation: kenburns 40s ease-in-out infinite alternate;
   animation: kenburns 40s ease-in-out infinite alternate;
+  -webkit-transform-origin: center center;
   transform-origin: center center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   will-change: transform;
 }
 @media (max-width: 640px) {
-  .kenburns { animation-duration: 32s; }
+  .kenburns { -webkit-animation-duration: 32s; animation-duration: 32s; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .kenburns { animation: none; }
+  .kenburns { -webkit-animation: none; animation: none; }
 }
           `}</style>
         </section>

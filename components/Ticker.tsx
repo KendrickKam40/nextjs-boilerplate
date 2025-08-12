@@ -28,8 +28,11 @@ export default function Ticker({ phrase }: { phrase: string }) {
         .ticker-track {
           display: flex;
           width: max-content;         /* size to content (two groups) */
+          -webkit-animation: ticker 120s linear infinite;
           animation: ticker 120s linear infinite;
           will-change: transform;
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
         }
 
         .ticker-group {
@@ -47,16 +50,22 @@ export default function Ticker({ phrase }: { phrase: string }) {
           line-height: 1;             /* avoid vertical overlap */
           color: #d6112c;
           font-size: 1.6em;
+          -webkit-font-smoothing: antialiased;
+        }
+
+        @-webkit-keyframes ticker {
+          0%   { -webkit-transform: translateX(0%); transform: translateX(0%); }
+          100% { -webkit-transform: translateX(-50%); transform: translateX(-50%); }
         }
 
         @keyframes ticker {
-          0%   { transform: translateX(0%); }
-          100% { transform: translateX(-50%); } /* slide by exactly one group width */
+          0%   { -webkit-transform: translateX(0%); transform: translateX(0%); }
+          100% { -webkit-transform: translateX(-50%); transform: translateX(-50%); }
         }
 
-        /* On hover, PAUSE (don’t change the speed mid-cycle, which causes a jump) */
+        /* On hover, PAUSE */
         @media (hover:hover) {
-          .ticker-track:hover { animation-play-state: paused; }
+          .ticker-track:hover { -webkit-animation-play-state: paused; animation-play-state: paused; }
         }
       `}</style>
     </div>
