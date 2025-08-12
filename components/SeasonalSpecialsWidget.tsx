@@ -37,8 +37,16 @@ export default function SeasonalSpecialsWidget() {
       try {
         // Fetch client metadata and menu items in parallel
         const [clientRes, menuRes] = await Promise.all([
-          fetch('/api/client'),
-          fetch('/api/menu'),
+          fetch('/api/client', {
+          next: {
+            revalidate: 3600, // 1 hour
+          },
+        }),
+          fetch('/api/menu', {
+          next: {
+            revalidate: 3600, // 1 hour
+          },
+        }),
         ]);
 
         if (!clientRes.ok) throw new Error(`Client error: ${clientRes.status}`);

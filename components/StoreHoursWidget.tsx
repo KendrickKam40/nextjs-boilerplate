@@ -22,7 +22,11 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch('/api/client');
+        const res = await fetch('/api/client', {
+          next: {
+            revalidate: 3600, // 1 hour
+          },
+        });
         if (!res.ok) throw new Error('Network response was not ok');
         const client = (await res.json()) as ClientData;
         setData(client);

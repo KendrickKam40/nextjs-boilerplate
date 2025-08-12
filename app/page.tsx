@@ -4,11 +4,11 @@
 import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Mail, BookOpen, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
-import Card from '@/components/Card';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
+import Ticker from '@/components/Ticker';
 import Menu, { MenuOption } from '@/components/Menu';
 import LoyaltyDashboard from '@/components/LoyaltyDashboard';
 import SeasonalSpecialsWidget from '@/components/SeasonalSpecialsWidget';
@@ -38,12 +38,20 @@ export default function HomePage() {
   // bookingAccess
   const [bookingAccess, setBookingAccess] = useState<boolean>(false);
 
+  const [clientData, setClientData] = useState<ClientResponse | null>(null);
+  const [menuData, setMenuData] = useState<MenuResponse | null>(null);
+
+
 
   // Fetch primaryColor from API and convert ARGB → CSS hex
   useEffect(() => {
     async function loadTheme() {
       try {
-        const res = await fetch('/api/client');
+        const res = await fetch('/api/client', {
+          next: {
+            revalidate: 3600, // 1 hour
+          },
+        });
         if (!res.ok) return;
         const { primaryColor: rawPrimary, secondaryColor: rawSecondary, bgImage: bgImage , aboutUs: aboutUs, bookingAccess: bookingAccess} =
           (await res.json()) as {
@@ -198,34 +206,33 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ─── SCROLLING BANNER ───────────────────────────────────────────────── */}
+        <Ticker />
+
 
         {/* ─── OUR STORY ────────────────────────────────────────────────────── */}
-        <section id="about" className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center my-12 sm:my-16 px-4">
-          {/* Image */}
-          <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
-            <div className="relative w-full h-64 lg:h-96 rounded-2xl overflow-hidden shadow-md">
+        <section
+          id="about"
+          className="bg-[#FFFFFF] py-16" // soft, vibrant backdrop reminiscent of Staays’ Stories section
+        >
+          <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
+            <h2 className="text-4xl font-serif font-bold text-[#24333F]">
+              Our Story
+            </h2>
+            {/* Prominent image with rounded corners and shadow */}
+            <div className="relative mx-auto w-full h-64 sm:h-72 md:h-80 rounded-2xl overflow-hidden shadow-md">
               <Image
                 src="/menu/smoothie.jpg"
                 alt="Our history"
                 fill
                 className="object-cover"
+                priority
               />
             </div>
-          </div>
-          {/* Text */}
-          <div className="w-full lg:w-1/2 lg:pl-12 space-y-4 text-center lg:text-left">
-            <h2 className="text-2xl font-semibold text-[#24333F]">Our Story</h2>
-            <p className="text-[#4A5058]">
+            {/* Centered description */}
+            <p className="text-lg leading-relaxed text-[#4A5058]">
               {aboutUs}
             </p>
-            {/* <Button
-              variant="outline"
-              color={primaryColor}
-              className="py-2 px-6 mx-auto lg:mx-0"
-              onClick={() => setActiveModal('about')}
-            >
-              Read more
-            </Button> */}
           </div>
         </section>
 
