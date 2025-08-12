@@ -20,13 +20,24 @@ const StoreHoursWidget = dynamic(
 );
 
 export default function HomePage() {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [activeModal, setActiveModal] = useState<'about' | 'points' | ''>('');
+  const [activeModal, setActiveModal] =  useState<'about' | 'points' | 'order' | 'booking' |''>('');
+  const [isBgLoaded, setIsBgLoaded] = useState(false);
   const [primaryColor, setPrimaryColor] = useState<string>('#d6112c');
   const [secondaryColor, setSecondaryColor] = useState('#9a731e');
 
   // BG IMAGE
-  const [bgImage, setBgImage] = useState<string>('/HeroBackground.webp');
+  const [bgImage, setBgImage] = useState<string>('');
+
+  // aboutUs
+  const [aboutUs, setAboutUs] = useState<string>('');
+
+
+  // bookingAccess
+  const [bookingAccess, setBookingAccess] = useState<boolean>(false);
+
 
   // Fetch primaryColor from API and convert ARGB → CSS hex
   useEffect(() => {
@@ -34,23 +45,59 @@ export default function HomePage() {
       try {
         const res = await fetch('/api/client');
         if (!res.ok) return;
-        const { primaryColor: rawPrimary , secondaryColor: rawSecondary , bgImage: bgImage} =  (await res.json()) as { primaryColor: string; secondaryColor: string , bgImage: string };
+        const { primaryColor: rawPrimary, secondaryColor: rawSecondary, bgImage: bgImage , aboutUs: aboutUs, bookingAccess: bookingAccess} =
+          (await res.json()) as {
+            primaryColor: string;
+            secondaryColor: string;
+            bgImage: string;
+            aboutUs: string;
+            bookingAccess: boolean;
+          };
+
         setPrimaryColor('#' + rawPrimary.substring(rawPrimary.length - 6));
         setSecondaryColor('#' + rawSecondary.slice(-6));
         setBgImage(bgImage);
-
-        console.log('BGIMG' ,bgImage);
+        setAboutUs(aboutUs); // Set aboutUs if available
+        setBookingAccess(bookingAccess); // Default to false if not provided
       } catch {
-        // keep default
+        // keep default values if the fetch fails
+      } finally {
+        // Regardless of success or failure, stop showing the page-loading skeleton
+        setIsPageLoading(false);
       }
     }
     loadTheme();
   }, []);
 
+
+  // Reset background image loading state when bgImage changes
+  useEffect(() => {
+    setIsBgLoaded(false);
+  }, [bgImage]);
+
   const options: MenuOption[] = [
-    { label: 'Order Online', onClick: () => {/* ordering logic */} },
+    { label: 'Order Online', onClick: () => setActiveModal('order') },
     { label: 'Our Story',   onClick: () => setActiveModal('about') },
   ];
+
+  // If page is still loading, show a skeleton
+  if (isPageLoading) {
+    return (
+      <main className="min-h-screen bg-[#FAF3EA]">
+        <div className="animate-pulse max-w-6xl mx-auto px-4 py-12 space-y-6">
+          {/* Skeleton for header */}
+          <div className="h-12 bg-gray-300 rounded-md"></div>
+          {/* Skeleton for hero section */}
+          <div className="h-64 bg-gray-200 rounded-md"></div>
+          {/* Skeleton for the About or other sections */}
+          <div className="h-48 bg-gray-200 rounded-md"></div>
+          <div className="h-48 bg-gray-200 rounded-md"></div>
+          {/* Skeleton for footer */}
+          <div className="h-12 bg-gray-300 rounded-md"></div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>
@@ -86,16 +133,23 @@ export default function HomePage() {
         <section className="relative w-full pt-20 pb-10">
           {/* Background image & overlay */}
           <div className="absolute inset-0">
-            <Image
-              // src="/HeroBackground.webp"
-              src={bgImage}
-              alt="Hero background"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/60"></div>
-          </div>
+          {/* Placeholder while the real image loads */}
+          {!isBgLoaded && (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+              {/* Optional: a simple spinner could be placed here */}
+            </div>
+          )}
+
+          <Image
+            src={bgImage}
+            alt="Hero background"
+            fill
+            className={`object-cover transition-opacity duration-500 ${isBgLoaded ? 'opacity-100' : 'opacity-0'}`}
+            priority
+            onLoadingComplete={() => setIsBgLoaded(true)}
+          />
+          <div className="absolute inset-0 bg-black/60"></div>
+        </div>
 
           {/* Content */}
           <div className="relative max-w-6xl mx-auto flex flex-col-reverse lg:flex-row items-center px-4 py-12 sm:py-20">
@@ -109,9 +163,23 @@ export default function HomePage() {
               </div>
               
               <div className="flex justify-center lg:justify-start space-x-4">
-                <Button color={primaryColor} className="py-2 px-12 text-sm">
+                <Button 
+                color={primaryColor} 
+                className="py-2 px-12 text-sm"
+                onClick={() => setActiveModal('order')}
+                >
                   Order Online
                 </Button>
+              {bookingAccess && (
+                <Button
+                  variant="outline"
+                  color={secondaryColor}
+                  className="py-2 px-12 text-sm"
+                  onClick={() => setActiveModal('booking')}
+                >
+                  Book Online
+                </Button>
+              )}
               </div>
             </div>
 
@@ -148,27 +216,22 @@ export default function HomePage() {
           <div className="w-full lg:w-1/2 lg:pl-12 space-y-4 text-center lg:text-left">
             <h2 className="text-2xl font-semibold text-[#24333F]">Our Story</h2>
             <p className="text-[#4A5058]">
-              Founded in 2022, Balibu brings together bold Indonesian spices and the freshest local ingredients to craft soulful IndoFusion bowls and bites. With lightning-fast ordering across any device and a rewards program that celebrates every visit, we make enjoying great food simple, speedy, and always worth coming back for.
+              {aboutUs}
             </p>
-            <Button
+            {/* <Button
               variant="outline"
               color={primaryColor}
               className="py-2 px-6 mx-auto lg:mx-0"
               onClick={() => setActiveModal('about')}
             >
               Read more
-            </Button>
+            </Button> */}
           </div>
         </section>
 
         {/* ─── SEASONAL OFFERS ──────────────────────────────────────────────── */}
-        <section className="bg-white py-12 sm:py-16">
-          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center px-4">
-            <div className="w-full space-y-4">
-              <SeasonalSpecialsWidget />
-            </div>
-          </div>
-        </section>
+
+        <SeasonalSpecialsWidget />
 
         {/* ─── FOR LUNCH ─────────────────────────────────────────────────────
         <section id="menu" className="max-w-6xl mx-auto text-center my-12 sm:my-16 px-4 space-y-6">
@@ -235,6 +298,40 @@ export default function HomePage() {
         >
           <div className="mx-auto w-full max-w-xs">
             <LoyaltyDashboard />
+          </div>
+        </Modal>
+
+        <Modal
+          open={activeModal === 'order'}
+          title="Order Online"
+          bgColor="#F2EAE2"
+          textColor="#000"
+          width="90%"
+          onClose={() => setActiveModal('')}
+        >
+          <div className="relative w-full h-[80vh]">
+            <iframe
+              src="https://ordering.balibu.co.nz/"
+              title="Order Online"
+              className="w-full h-full rounded-md"
+            />
+          </div>
+        </Modal>
+
+        <Modal
+          open={activeModal === 'booking'}
+          title="Book Online"
+          bgColor="#F2EAE2"
+          textColor="#000"
+          width="90%"
+          onClose={() => setActiveModal('')}
+        >
+          <div className="relative w-full h-[80vh]">
+            <iframe
+              src="https://booking.balibu.co.nz/"
+              title="Book Online"
+              className="w-full h-full rounded-md"
+            />
           </div>
         </Modal>
 

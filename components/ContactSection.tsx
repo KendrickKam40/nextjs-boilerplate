@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 
 interface ClientData {
-  companyAddress: string;
+  address: string;
   companyNumber: string;
   openTimes: Record<string, string>;
 }
@@ -35,12 +35,12 @@ export default function ContactSection() {
         const payload = await res.json();
         const client: ClientData = payload.client ?? payload;
 
-        setCompanyAddress(client.companyAddress);
+        setCompanyAddress(client.address);
         setCompanyNumber(client.companyNumber);
         setOpenTimes(client.openTimes || {});
         setMapSrc(
           `https://www.google.com/maps?q=${encodeURIComponent(
-            client.companyAddress
+            client.address
           )}&output=embed`
         );
       } catch (err: any) {

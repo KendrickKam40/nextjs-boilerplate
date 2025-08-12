@@ -14,10 +14,8 @@ async function proxyClient() {
       body: JSON.stringify({ clientId: process.env.MAXORDER_CLIENT_ID! }),
     }
   );
-  console.log('res', res);
   if (!res.ok) throw new Error('Upstream error ' + res.status);
   const { client } = await res.json();
-  console.log('client', client);  
   return client;
 }
 
