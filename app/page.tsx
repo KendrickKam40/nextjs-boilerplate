@@ -19,6 +19,32 @@ const StoreHoursWidget = dynamic(
   { ssr: true }
 );
 
+interface ClientResponse {
+  primaryColor: string;
+  secondaryColor: string;
+  bgImage: string;
+  aboutUs: string;
+  bookingAccess: boolean;
+  coverImage: string;
+  address: string;
+  companyNumber: string;
+  openTimes: Record<string, string>;
+  // …include any other fields returned by /api/client
+}
+
+interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  showCase: boolean;
+  order: number;
+}
+
+interface MenuResponse {
+  menuItems: MenuItem[];
+}
+
 export default function HomePage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
 
@@ -43,40 +69,72 @@ export default function HomePage() {
 
 
 
-  // Fetch primaryColor from API and convert ARGB → CSS hex
-  useEffect(() => {
-    async function loadTheme() {
-      try {
-        const res = await fetch('/api/client', {
-          next: {
-            revalidate: 3600, // 1 hour
-          },
-        });
-        if (!res.ok) return;
-        const { primaryColor: rawPrimary, secondaryColor: rawSecondary, bgImage: bgImage , aboutUs: aboutUs, bookingAccess: bookingAccess} =
-          (await res.json()) as {
-            primaryColor: string;
-            secondaryColor: string;
-            bgImage: string;
-            aboutUs: string;
-            bookingAccess: boolean;
-          };
+  // // Fetch primaryColor from API and convert ARGB → CSS hex
+  // useEffect(() => {
+  //   async function loadTheme() {
+  //     try {
+  //       const res = await fetch('/api/client', {
+  //         next: {
+  //           revalidate: 3600, // 1 hour
+  //         },
+  //       });
+  //       if (!res.ok) return;
+  //       const { primaryColor: rawPrimary, secondaryColor: rawSecondary, bgImage: bgImage , aboutUs: aboutUs, bookingAccess: bookingAccess} =
+  //         (await res.json()) as {
+  //           primaryColor: string;
+  //           secondaryColor: string;
+  //           bgImage: string;
+  //           aboutUs: string;
+  //           bookingAccess: boolean;
+  //         };
 
-        setPrimaryColor('#' + rawPrimary.substring(rawPrimary.length - 6));
-        setSecondaryColor('#' + rawSecondary.slice(-6));
-        setBgImage(bgImage);
-        setAboutUs(aboutUs); // Set aboutUs if available
-        setBookingAccess(bookingAccess); // Default to false if not provided
-      } catch {
-        // keep default values if the fetch fails
+  //       setPrimaryColor('#' + rawPrimary.substring(rawPrimary.length - 6));
+  //       setSecondaryColor('#' + rawSecondary.slice(-6));
+  //       setBgImage(bgImage);
+  //       setAboutUs(aboutUs); // Set aboutUs if available
+  //       setBookingAccess(bookingAccess); // Default to false if not provided
+  //     } catch {
+  //       // keep default values if the fetch fails
+  //     } finally {
+  //       // Regardless of success or failure, stop showing the page-loading skeleton
+  //       setIsPageLoading(false);
+  //     }
+  //   }
+  //   loadTheme();
+  // }, []);
+
+  useEffect(() => {
+    async function loadInitialData() {
+      try {
+        // fetch both endpoints in parallel
+        const [clientRes, menuRes] = await Promise.all([
+          fetch('/api/client'),
+          fetch('/api/menu'),
+        ]);
+        if (!clientRes.ok || !menuRes.ok) {
+          throw new Error('Failed to fetch API data');
+        }
+        const clientJson = (await clientRes.json()) as ClientResponse;
+        const menuJson = (await menuRes.json()) as MenuResponse;
+
+        // update colours and state from client data
+        setPrimaryColor('#' + clientJson.primaryColor.slice(-6));
+        setSecondaryColor('#' + clientJson.secondaryColor.slice(-6));
+        setBgImage(clientJson.bgImage);
+        setAboutUs(clientJson.aboutUs);
+        setBookingAccess(clientJson.bookingAccess);
+
+        setClientData(clientJson);
+        setMenuData(menuJson);
+      } catch (err) {
+        // handle error and keep fallback values
+        console.error(err);
       } finally {
-        // Regardless of success or failure, stop showing the page-loading skeleton
         setIsPageLoading(false);
       }
     }
-    loadTheme();
+    loadInitialData();
   }, []);
-
 
   // Reset background image loading state when bgImage changes
   useEffect(() => {
@@ -238,7 +296,12 @@ export default function HomePage() {
 
         {/* ─── SEASONAL OFFERS ──────────────────────────────────────────────── */}
 
-        <SeasonalSpecialsWidget />
+        {clientData && menuData && (
+          <SeasonalSpecialsWidget
+            coverImage={clientData.coverImage}
+            menuItems={menuData.menuItems}
+          />
+        )}
 
         {/* ─── FOR LUNCH ─────────────────────────────────────────────────────
         <section id="menu" className="max-w-6xl mx-auto text-center my-12 sm:my-16 px-4 space-y-6">
@@ -250,9 +313,15 @@ export default function HomePage() {
           </Button>
         </section> */}
 
-        <section id="contact" className="max-w-6xl mx-auto my-12 sm:my-16 px-4 space-y-6">
-        <ContactSection />
-        </section>
+        {clientData && (
+          <div id="contact" className="max-w-6xl mx-auto my-12 sm:my-16 px-4 space-y-6">
+            <ContactSection
+              address={clientData.address}
+              companyNumber={clientData.companyNumber}
+              openTimes={clientData.openTimes}
+            />
+          </div>
+        )}
 
       
         {/* ─── FOOTER ──────────────────────────────────────────────────────── */}

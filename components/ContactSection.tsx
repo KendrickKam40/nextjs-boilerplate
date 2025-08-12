@@ -1,7 +1,7 @@
 // components/ContactSection.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 interface ClientData {
   address: string;
@@ -9,65 +9,19 @@ interface ClientData {
   openTimes: Record<string, string>;
 }
 
-const WEEKDAYS = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
+interface ContactSectionProps {
+  address: string;
+  companyNumber: string;
+  openTimes: Record<string, string>;
+}
 
-export default function ContactSection() {
-  const [companyAddress, setCompanyAddress] = useState('');
-  const [companyNumber, setCompanyNumber] = useState('');
-  const [openTimes, setOpenTimes] = useState<Record<string, string>>({});
-  const [mapSrc, setMapSrc] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const WEEKDAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as const;
 
-  useEffect(() => {
-    async function loadClient() {
-      try {
-        const res = await fetch('/api/client', {
-          next: {
-            revalidate: 3600, // 1 hour
-          },
-        });
-        if (!res.ok) throw new Error(`Status ${res.status}`);
-        const payload = await res.json();
-        const client: ClientData = payload.client ?? payload;
-
-        setCompanyAddress(client.address);
-        setCompanyNumber(client.companyNumber);
-        setOpenTimes(client.openTimes || {});
-        setMapSrc(
-          `https://www.google.com/maps?q=${encodeURIComponent(
-            client.address
-          )}&output=embed`
-        );
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadClient();
-  }, []);
-
-  if (loading)
-    return (
-      <div className="text-center py-8 text-[#4A5058]">
-        Loading contact info…
-      </div>
-    );
-  if (error)
-    return (
-      <div className="text-center py-8 text-[#EF4444]">
-        Unable to load contact info.
-      </div>
-    );
+export default function ContactSection({ address, companyNumber, openTimes = {} as Record<string, string> }: ContactSectionProps) {
+  const mapSrc = useMemo(() => {
+    if (!address) return '';
+    return `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+  }, [address]);
 
   return (
   <section className="bg-[#FAF3EA] py-12 sm:py-16">
@@ -88,7 +42,7 @@ export default function ContactSection() {
           </h3>
           <div className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm">
             {WEEKDAYS.map((day) => {
-              const times = openTimes[day]?.split(',') || [];
+              const times = openTimes?.[day]?.split(',') || [];
               return (
                 <div key={day} className="flex justify-between">
                   <span className="font-medium text-[#24333F]">{day}</span>
@@ -121,7 +75,7 @@ export default function ContactSection() {
           </div>
           <div>
             <h4 className="text-lg font-semibold text-[#24333F]">Address</h4>
-            <p className="text-[#4A5058]">{companyAddress}</p>
+            <p className="text-[#4A5058]">{address}</p>
           </div>
         </div>
 

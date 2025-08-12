@@ -1,13 +1,8 @@
 // components/SeasonalSpecialsWidget.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
-import { Loader2, Star } from 'lucide-react';
-
-interface ClientResponse {
-  coverImage: string;
-}
 
 interface MenuResponse {
   menuItems: Array<{
@@ -26,80 +21,26 @@ interface Special {
   price: string;
 }
 
-export default function SeasonalSpecialsWidget() {
-  const [coverImage, setCoverImage] = useState<string>('');
-  const [specials, setSpecials] = useState<Special[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+interface SeasonalSpecialsWidgetProps {
+  coverImage: string;
+  menuItems: MenuResponse['menuItems'];
+}
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        // Fetch client metadata and menu items in parallel
-        const [clientRes, menuRes] = await Promise.all([
-          fetch('/api/client', {
-          next: {
-            revalidate: 3600, // 1 hour
-          },
-        }),
-          fetch('/api/menu', {
-          next: {
-            revalidate: 3600, // 1 hour
-          },
-        }),
-        ]);
+export default function SeasonalSpecialsWidget({ coverImage, menuItems }: SeasonalSpecialsWidgetProps) {
+  const specials = useMemo<Special[]>(() => {
+    return (menuItems ?? [])
+      .filter(item => item.showCase)
+      .sort((a, b) => a.order - b.order)
+      .slice(0, 4)
+      .map(item => ({
+        name: item.name,
+        description: (item.description || '').trim(),
+        price: `$${item.price.toFixed(2)}`,
+      }));
+  }, [menuItems]);
 
-        if (!clientRes.ok) throw new Error(`Client error: ${clientRes.status}`);
-        if (!menuRes.ok) throw new Error(`Menu error: ${menuRes.status}`);
-
-        const clientData = (await clientRes.json()) as ClientResponse;
-        const menuData = (await menuRes.json()) as MenuResponse;
-
-        // Set the banner image
-        setCoverImage(clientData.coverImage);
-
-        // Filter for showCase items, sort by `order`, and take the first four
-        const featured = menuData.menuItems
-          .filter(item => item.showCase)
-          .sort((a, b) => a.order - b.order)
-          .slice(0, 4)
-          .map(item => ({
-            name: item.name,
-            description: (item.description || '').trim(),
-            price: `$${item.price.toFixed(2)}`,
-          }));
-
-        setSpecials(featured);
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="bg-white p-6 w-full flex flex-col items-center justify-center space-y-2">
-        <Loader2 className="h-6 w-6 text-[#d6112c] animate-spin" />
-        <span className="text-[#4A5058]">Loading specials…</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-white p-6 w-full flex flex-col items-center justify-center space-y-2">
-        <Star className="h-6 w-6 text-[#EF4444]" />
-        <span className="text-[#EF4444]">Error: {error}</span>
-      </div>
-    );
-  }
-
-  if (!loading && !error && specials.length === 0) {
+  // If there are no showcase items, render nothing to avoid empty spacing
+  if (specials.length === 0) {
     return null;
   }
 

@@ -34,7 +34,7 @@ export default function Ticker() {
         .ticker-track {
           display: flex;
           width: max-content;         /* size to content (two groups) */
-          animation: ticker 18s linear infinite;
+          animation: ticker 36s linear infinite;
           will-change: transform;
         }
 
