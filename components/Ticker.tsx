@@ -1,22 +1,21 @@
 {/* ─── SCROLLING BANNER (SEAMLESS) ───────────────────────────────────── */}
 export default function Ticker() {
   const items = [
-    'Savour IndoFusion Bowls',
-    'Order Online Now',
-    'Earn Rewards',
-    'Seasonal Specials',
+    'SAVOUR INDOFUSION BOWLS',
+    'ORDER ONLINE NOW',
+    'SEASONAL SPECIALS',
   ];
   // Duplicate items so each half of the track is comfortably wider than the viewport
   const looped = Array(4).fill(items).flat();
 
   return (
-    <div className="relative overflow-hidden border-y border-[#EAE0DA] bg-white py-2">
+    <div className="relative overflow-hidden border-y border-[#EAE0DA] bg-white py-6">
       <div className="ticker-track">
         {/* Group A */}
         <div className="ticker-group" aria-hidden="false">
           {looped.map((t, i) => (
             <span key={`a-${i}`} className="ticker-item">
-              {t} •
+              {t}
             </span>
           ))}
         </div>
@@ -24,7 +23,7 @@ export default function Ticker() {
         <div className="ticker-group" aria-hidden="true">
           {looped.map((t, i) => (
             <span key={`b-${i}`} className="ticker-item">
-              {t} •
+              {t}
             </span>
           ))}
         </div>
@@ -53,6 +52,7 @@ export default function Ticker() {
           font-weight: 700;
           line-height: 1;             /* avoid vertical overlap */
           color: #d6112c;
+          font-size: 1.3em;
         }
 
         @keyframes ticker {
