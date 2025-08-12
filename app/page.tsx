@@ -183,13 +183,13 @@ export default function HomePage() {
 
             {/* Icons & Menu */}
             <div className="flex items-center space-x-4">
-              <button
+              {/* <button
                 onClick={() => setActiveModal('points')}
                 aria-label="My Points"
                 className="p-1 rounded-full hover:bg-white/20"
               >
                 <Star className="w-5 h-5 text-white" />
-              </button>
+              </button> */}
               <Menu options={options} buttonColor="#fff" />
             </div>
           </div>
