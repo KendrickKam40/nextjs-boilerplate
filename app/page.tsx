@@ -69,7 +69,47 @@ export default function HomePage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
   const [activeModal, setActiveModal] =  useState<'about' | 'points' | 'order' | 'booking' |''>('');
+  // Close the order overlay using browser history when possible
+  const closeOrder = () => {
+    try {
+      if (typeof window !== 'undefined' && window.history?.state?.modal === 'order') {
+        // consume the history entry we added on open
+        window.history.back();
+        return;
+      }
+    } catch {}
+    setActiveModal('');
+  };
+
+  // Make the Order overlay back-button friendly: push state on open, close on back
+  useEffect(() => {
+    if (activeModal !== 'order') return;
+
+    const onPop = () => {
+      setActiveModal('');
+    };
+
+    // push a transient history entry so Back will close the overlay
+    try {
+      window.history.pushState({ modal: 'order' }, '');
+      window.addEventListener('popstate', onPop);
+    } catch {}
+
+    return () => {
+      // remove listener; don't call back() here because closeOrder handles UI closes
+      window.removeEventListener('popstate', onPop);
+    };
+  }, [activeModal]);
+
+  useEffect(() => {
+    if (activeModal !== 'order') return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeOrder(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [activeModal]);
+
   const [isBgReady, setIsBgReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState<string>('#d6112c');
   const [secondaryColor, setSecondaryColor] = useState('#9a731e');
@@ -232,6 +272,15 @@ export default function HomePage() {
       img.onerror = null as any;
     };
   }, [bgImage]);
+
+  // Lock body scroll while full-screen order view is open
+  useEffect(() => {
+    if (activeModal === 'order') {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [activeModal]);
 
   const options: MenuOption[] = [
     { label: 'Order Online', onClick: () => setActiveModal('order') },
@@ -487,22 +536,45 @@ export default function HomePage() {
           </div>
         </Modal>
 
-        <Modal
-          open={activeModal === 'order'}
-          title="Order Online"
-          bgColor="#F2EAE2"
-          textColor="#000"
-          width="90%"
-          onClose={() => setActiveModal('')}
-        >
-          <div className="relative w-full h-[80vh]">
-            <iframe
-              src="https://ordering.balibu.co.nz/"
-              title="Order Online"
-              className="w-full h-full rounded-md"
-            />
+        {activeModal === 'order' && (
+          <div
+            className="fixed inset-0 z-[70] bg-white"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Order Online"
+          >
+            {/* Top bar */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b bg-[#F2EAE2]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+              <h2 className="text-base sm:text-lg font-semibold text-[#24333F]">Order Online</h2>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={closeOrder}
+                  aria-label="Close"
+                  className="h-11 w-11 rounded-full grid place-items-center hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{ color: '#24333F' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Full-viewport iframe */}
+            <div className="w-full" style={{ height: 'calc(100vh - 56px)' }}>
+              <iframe
+                src="https://ordering.balibu.co.nz/"
+                title="Order Online"
+                className="w-full h-full"
+              />
+            </div>
+
+            <style jsx>{`
+              @media (max-width: 640px) {
+                /* Ensure the iframe fills under varying header heights on mobile */
+                div[role='dialog'] > div + div { height: calc(100vh - 56px); }
+              }
+            `}</style>
           </div>
-        </Modal>
+        )}
 
         <Modal
           open={activeModal === 'booking'}
@@ -521,11 +593,7 @@ export default function HomePage() {
           </div>
         </Modal>
 
-        <iframe
-          ref={iframeRef}
-          className="hidden"
-          src="https://order.example.com"
-        />
+        {/* (Optional) Remove the hidden prefetch iframe if not needed */}
       </main>
     </>
   );
