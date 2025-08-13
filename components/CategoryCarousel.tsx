@@ -291,7 +291,7 @@ export default function CategoryCarousel({
             })}
           </div>
 
-          <div className="flex justify-center gap-3 mt-4">
+          <div className="flex justify-center lg:justify-end gap-3 mt-4">
             <button
               aria-label="Previous"
               onClick={() => scrollByCards(-1)}
