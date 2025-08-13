@@ -12,7 +12,6 @@ interface MenuResponse {
     price: number;
     showCase: boolean;
     order: number;
-    showOnDisplay: boolean;
   }>;
 }
 
@@ -31,7 +30,7 @@ export default function SeasonalSpecialsWidget({ coverImage, menuItems = [] }: S
 
   const specials = useMemo<Special[]>(() => {
     return menuItems
-      .filter(item => item.showOnDisplay)
+      .filter(item => item.showCase)
       .sort((a, b) => a.order - b.order)
       .slice(0, 4)
       .map(item => ({

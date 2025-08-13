@@ -12,11 +12,24 @@ import Menu, { MenuOption } from '@/components/Menu';
 import LoyaltyDashboard from '@/components/LoyaltyDashboard';
 import SeasonalSpecialsWidget from '@/components/SeasonalSpecialsWidget';
 import ContactSection from '@/components/ContactSection';
+import CategoryCarousel from '@/components/CategoryCarousel';
 
 const StoreHoursWidget = dynamic(
   () => import('@/components/StoreHoursWidget'),
   { ssr: true }
 );
+
+interface Category {
+  name: string;
+  visible?: boolean;
+  avalibleFrom?: string;
+  avalibleTo?: string;
+  days?: string[];
+  order?: number;
+}
+interface CategoryResponse {
+  categories: Category[];
+}
 
 interface ClientResponse {
   primaryColor: string;
@@ -32,6 +45,7 @@ interface ClientResponse {
   logoImage: string; // Optional field for logo image
   kioskMessage?: string; // Optional field for kiosk message
   announceTitle?: string; // Optional field for announcement title
+  littlesImages?: string[];
   // …include any other fields returned by /api/client
 }
 
@@ -42,6 +56,8 @@ interface MenuItem {
   price: number;
   showCase: boolean;
   order: number;
+  showOnDisplay: boolean; // Use this field to filter specials
+  category?: string; // Optional category field for filtering
 }
 
 interface MenuResponse {
@@ -76,19 +92,24 @@ export default function HomePage() {
   const [menuData, setMenuData] = useState<MenuResponse | null>(null);
 
 
+  // category carousel state
+  const [categoriesData, setCategoriesData] = useState<CategoryResponse | null>(null);
+
   useEffect(() => {
     async function loadInitialData() {
       try {
         // fetch both endpoints in parallel
-        const [clientRes, menuRes] = await Promise.all([
+        const [clientRes, menuRes,categoriesRes] = await Promise.all([
           fetch('/api/client'),
           fetch('/api/menu'),
+          fetch('/api/categories'),
         ]);
         if (!clientRes.ok || !menuRes.ok) {
           throw new Error('Failed to fetch API data');
         }
         const clientJson = (await clientRes.json()) as ClientResponse;
         const menuJson = (await menuRes.json()) as MenuResponse;
+        const categoriesJson = (await categoriesRes.json()) as CategoryResponse;
 
         // update colours and state from client data
         setPrimaryColor('#' + clientJson.primaryColor.slice(-6));
@@ -100,6 +121,8 @@ export default function HomePage() {
         setLogoImage(clientJson.logoImage); // Fallback to default logo if not provided
         setClientData(clientJson);
         setMenuData(menuJson);
+        setCategoriesData(categoriesJson);
+        
       } catch (err) {
         // handle error and keep fallback values
         console.error(err);
@@ -116,6 +139,68 @@ export default function HomePage() {
     const fallback = 'Fresh Local Meets Indonesian Spice';
     return (fromApi && fromApi.trim().length > 0) ? fromApi.trim() : fallback;
   }, [clientData]);
+
+  const hasShowcase = useMemo(() => {
+    const items = menuData?.menuItems ?? [];
+    return items.some((it: any) => {
+      const flag = it?.showCase ?? it?.showcase ?? it?.isShowcase ?? it?.featured;
+      return typeof flag === 'string' ? flag.toLowerCase() === 'true' : Boolean(flag);
+    });
+  }, [menuData]);
+
+  const topCategories = useMemo(() => {
+    const all = categoriesData?.categories ?? [];
+    if (all.length === 0) return [] as Category[];
+
+    const now = new Date();
+    const weekday = now.toLocaleDateString(undefined, { weekday: 'long' });
+    const toMins = (hhmm?: string) => {
+      if (!hhmm || hhmm.length < 3) return 0;
+      const h = parseInt(hhmm.slice(0, 2), 10) || 0;
+      const m = parseInt(hhmm.slice(2, 4) || '0', 10) || 0;
+      return h * 60 + m;
+    };
+    const cur = now.getHours() * 60 + now.getMinutes();
+
+    // visible + available today + time window
+    let filtered = all.filter((c) => {
+      const vis = c.visible !== false;
+      const daysOk = !c.days || c.days.includes(weekday);
+      const from = toMins(c.avalibleFrom);
+      const to = toMins(c.avalibleTo);
+      const timeOk = to === 0 ? true : cur >= from && cur <= to;
+      return vis && daysOk && timeOk;
+    });
+
+    // Filter out categories with no menu items (case-insensitive, trimmed match)
+    const menuItems = menuData?.menuItems ?? [];
+    filtered = filtered.filter((cat) => {
+      const catName = (cat.name ?? '').trim().toLowerCase();
+      if (!catName) return false;
+      return menuItems.some(
+        (item) =>
+          typeof item.category === 'string' &&
+          item.category.trim().toLowerCase() === catName
+      );
+    });
+
+    // uniquify by name, then sort
+    const map = new Map<string, Category>();
+    for (const c of filtered) {
+      const key = (c.name || '').trim();
+      if (!key) continue;
+      if (!map.has(key)) map.set(key, c);
+    }
+
+    return Array.from(map.values())
+      .sort((a, b) => {
+        const ao = Number.isFinite(a.order as number) ? (a.order as number) : 9999;
+        const bo = Number.isFinite(b.order as number) ? (b.order as number) : 9999;
+        if (ao !== bo) return ao - bo;
+        return String(a.name).localeCompare(String(b.name));
+      })
+      .slice(0, 5);
+  }, [categoriesData, menuData]);
 
   // Preload bg image (more robust than relying on onLoadingComplete)
   useEffect(() => {
@@ -318,12 +403,23 @@ export default function HomePage() {
 
         {/* ─── SEASONAL OFFERS ──────────────────────────────────────────────── */}
 
-        {clientData && menuData && (
+        {clientData && menuData && hasShowcase ? (
           <SeasonalSpecialsWidget
-            coverImage={clientData.coverImage}
-            menuItems={menuData.menuItems}
+            coverImage={'/seasonalSpecials.JPG'}
+            menuItems={menuData?.menuItems}
           />
-        )}
+        ) : (clientData && topCategories.length > 0 ? (
+          <CategoryCarousel
+            heading="Explore by Category"
+            subheading="From IndoFusion bowls to sweet treats — browse by what you’re craving."
+            categories={topCategories}
+            // images={clientData?.littlesImages ?? []}   // optional: can omit entirely
+            // imagesByCategory={{ 'Smoothies': '/imgs/smoothies.jpg' }} // optional fine control
+            onAllClick={() => setActiveModal('order')}
+            primaryColor={primaryColor}
+            menuItems={menuData?.menuItems}
+          />
+        ) : null)}  
 
         {clientData && (
           <div id="contact" className="max-w-6xl mx-auto my-12 sm:my-16 px-4 space-y-6">
