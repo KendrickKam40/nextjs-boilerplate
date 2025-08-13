@@ -24,7 +24,7 @@ export type MenuItem = {
   order?: number;
   soldOut?: number;          // 1 means sold out
   showOnDisplay?: boolean;   // optional flag from API
-  showOnKiosk?: boolean;     // optional flag from API
+  avalible?: number;     // optional flag from API
 };
 
 interface Props {
@@ -109,7 +109,7 @@ function MenuModal({
                           <h4 className="text-lg font-semibold text-[#24333F]">
                             {it.shortName || it.name}
                           </h4>
-                          {it.soldOut === 1 && (
+                          {it.soldOut === 0 && (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-700">
                               Sold out
                             </span>
@@ -214,7 +214,7 @@ export default function CategoryCarousel({
   
   return (menuItems || [])
     .filter(it =>
-      it.showOnKiosk === true &&
+      it.avalible === 0 &&
       (it.category || '').trim().toLowerCase() === target
     )
     .sort((a, b) => (a.order || 0) - (b.order || 0) || a.name.localeCompare(b.name));

@@ -61,7 +61,9 @@ interface MenuItem {
   category?: string; // Optional category field for filtering
   image?: string; // Optional image URL for the item
   showOnKiosk?: boolean; // Optional flag to indicate if it should be shown on
-}
+  soldOut?: number; // 1 means sold out, 0 means available
+  avalible?: number; // true if available, false if not
+  }
 
 interface MenuResponse {
   menuItems: MenuItem[];
@@ -222,7 +224,7 @@ export default function HomePage() {
     filtered = filtered.filter(cat => {
     const catName = (cat.name || '').trim().toLowerCase();
     return menuItems?.some(it =>
-      it.showOnKiosk === true &&
+      it.avalible === 0 &&
       it.category?.trim().toLowerCase() === catName
     );
   });
