@@ -59,6 +59,8 @@ interface MenuItem {
   order: number;
   showOnDisplay: boolean; // Use this field to filter specials
   category?: string; // Optional category field for filtering
+  image?: string; // Optional image URL for the item
+  showOnKiosk?: boolean; // Optional flag to indicate if it should be shown on
 }
 
 interface MenuResponse {
@@ -217,15 +219,13 @@ export default function HomePage() {
 
     // Filter out categories with no menu items (case-insensitive, trimmed match)
     const menuItems = menuData?.menuItems ?? [];
-    filtered = filtered.filter((cat) => {
-      const catName = (cat.name ?? '').trim().toLowerCase();
-      if (!catName) return false;
-      return menuItems.some(
-        (item) =>
-          typeof item.category === 'string' &&
-          item.category.trim().toLowerCase() === catName
-      );
-    });
+    filtered = filtered.filter(cat => {
+    const catName = (cat.name || '').trim().toLowerCase();
+    return menuItems?.some(it =>
+      it.showOnKiosk === true &&
+      it.category?.trim().toLowerCase() === catName
+    );
+  });
 
     // uniquify by name, then sort
     const map = new Map<string, Category>();
@@ -242,7 +242,7 @@ export default function HomePage() {
         if (ao !== bo) return ao - bo;
         return String(a.name).localeCompare(String(b.name));
       })
-      .slice(0, 5);
+      // .slice(0, 5);
   }, [categoriesData, menuData]);
 
   // Preload bg image (more robust than relying on onLoadingComplete)

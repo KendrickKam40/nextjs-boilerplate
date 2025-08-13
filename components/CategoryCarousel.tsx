@@ -24,6 +24,7 @@ export type MenuItem = {
   order?: number;
   soldOut?: number;          // 1 means sold out
   showOnDisplay?: boolean;   // optional flag from API
+  showOnKiosk?: boolean;     // optional flag from API
 };
 
 interface Props {
@@ -208,17 +209,16 @@ export default function CategoryCarousel({
 
   // Items to show in modal for selected category
   const itemsForSelected = useMemo(() => {
-    if (!selectedCategory) return [] as MenuItem[];
-    const target = selectedCategory.trim();
-    return (menuItems || [])
-      .filter((it) => (it.category || '').trim() === target)
-      .sort((a, b) => {
-        const ao = Number.isFinite(a?.order as number) ? (a.order as number) : 9999;
-        const bo = Number.isFinite(b?.order as number) ? (b.order as number) : 9999;
-        if (ao !== bo) return ao - bo;
-        return String(a.name).localeCompare(String(b.name));
-      });
-  }, [selectedCategory, menuItems]);
+  if (!selectedCategory) return [];
+  const target = selectedCategory.trim().toLowerCase();
+  
+  return (menuItems || [])
+    .filter(it =>
+      it.showOnKiosk === true &&
+      (it.category || '').trim().toLowerCase() === target
+    )
+    .sort((a, b) => (a.order || 0) - (b.order || 0) || a.name.localeCompare(b.name));
+}, [selectedCategory, menuItems]);
 
   return (
     <section className="bg-[#ffffff] py-16">
