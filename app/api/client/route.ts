@@ -18,7 +18,7 @@ async function fetchCombined(): Promise<BootstrapResponse> {
       'x-api-key': process.env.MAXORDER_API_KEY!,
     },
     body: JSON.stringify({ clientId: process.env.MAXORDER_CLIENT_ID! }),
-    next: { revalidate: 600 }, // cache hint
+    next: { revalidate: 5 }, // cache hint
   });
   if (!res.ok) throw new Error(`Upstream error ${res.status}`);
 
@@ -43,7 +43,7 @@ async function fetchCombined(): Promise<BootstrapResponse> {
 }
 
 const getCachedCombined = unstable_cache(fetchCombined, ['bootstrap-combined'], {
-  revalidate: 600, // 10 minutes
+  revalidate: 5, // 5 second
 });
 
 export async function GET() {
