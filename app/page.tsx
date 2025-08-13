@@ -46,6 +46,7 @@ interface ClientResponse {
   kioskMessage?: string; // Optional field for kiosk message
   announceTitle?: string; // Optional field for announcement title
   littlesImages?: string[];
+  openStatus?: number; // Optional field for open status
   // …include any other fields returned by /api/client
 }
 
@@ -98,18 +99,20 @@ export default function HomePage() {
   useEffect(() => {
     async function loadInitialData() {
       try {
-        // fetch both endpoints in parallel
-        const [clientRes, menuRes,categoriesRes] = await Promise.all([
-          fetch('/api/client'),
-          fetch('/api/menu'),
-          fetch('/api/categories'),
-        ]);
-        if (!clientRes.ok || !menuRes.ok) {
-          throw new Error('Failed to fetch API data');
-        }
-        const clientJson = (await clientRes.json()) as ClientResponse;
-        const menuJson = (await menuRes.json()) as MenuResponse;
-        const categoriesJson = (await categoriesRes.json()) as CategoryResponse;
+        const bootRes = await fetch('/api/client'); // now returns combined
+        if (!bootRes.ok) throw new Error('Failed to fetch API data');
+
+        const bootJson = (await bootRes.json()) as {
+          client: ClientResponse;
+          menuItems: MenuItem[];
+          categories: Category[];
+        };
+
+        // Split and set
+        const clientJson = bootJson.client;
+        const menuJson: MenuResponse = { menuItems: bootJson.menuItems };
+        const categoriesJson: CategoryResponse = { categories: bootJson.categories };
+
 
         // update colours and state from client data
         setPrimaryColor('#' + clientJson.primaryColor.slice(-6));
@@ -122,7 +125,7 @@ export default function HomePage() {
         setClientData(clientJson);
         setMenuData(menuJson);
         setCategoriesData(categoriesJson);
-        
+
       } catch (err) {
         // handle error and keep fallback values
         console.error(err);
@@ -336,7 +339,12 @@ export default function HomePage() {
               </div>
 
               <div className='flex justify-center'>
-                <StoreHoursWidget compact />
+                <StoreHoursWidget
+                  compact
+                  data={{ openTimes: clientData?.openTimes, openStatus: clientData?.openStatus }}
+                  loading={false} // or your page-level loading flag
+                  error={null}
+                />
               </div>
             </div>
           </div>

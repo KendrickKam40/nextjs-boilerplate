@@ -12,34 +12,61 @@ interface ClientData {
 interface StoreHoursWidgetProps {
   /** whether to render in a slim “header” style */
   compact?: boolean;
+  /**
+   * Prefer passing the client data from the parent (page.tsx) to avoid
+   * duplicate API calls. If provided, this component will not fetch.
+   */
+  data?: ClientData | null;
+  /** Optional parent-driven loading & error (if parent is fetching). */
+  loading?: boolean;
+  error?: string | null;
 }
 
-export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetProps) {
-  const [data, setData] = useState<ClientData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function StoreHoursWidget({ compact = false, data: dataProp = null, loading: loadingProp, error: errorProp }: StoreHoursWidgetProps) {
+  // Internal state only used when data is not provided by parent
+  const [dataInternal, setDataInternal] = useState<ClientData | null>(null);
+  const [loadingInternal, setLoadingInternal] = useState<boolean>(true);
+  const [errorInternal, setErrorInternal] = useState<string | null>(null);
+
+  const shouldFetch = dataProp == null; // if parent didn't pass data, we fetch as a fallback
 
   useEffect(() => {
+    if (!shouldFetch) {
+      // If parent supplies data, ensure internal loading is false
+      setLoadingInternal(false);
+      setErrorInternal(null);
+      return;
+    }
+
+    let cancelled = false;
     async function load() {
       try {
+        setLoadingInternal(true);
+        setErrorInternal(null);
         const res = await fetch('/api/client', {
-          next: {
-            revalidate: 3600, // 1 hour
-          },
+          next: { revalidate: 3600 }, // 1 hour
         });
         if (!res.ok) throw new Error('Network response was not ok');
         const client = (await res.json()) as ClientData;
-        setData(client);
+        if (!cancelled) setDataInternal(client);
       } catch (err: any) {
-        setError(err.message);
+        if (!cancelled) setErrorInternal(err.message);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoadingInternal(false);
       }
     }
     load();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldFetch]);
 
-  // loading / error: for compact, just show nothing or a spinner
+  // Resolve the effective sources (parent wins)
+  const data = dataProp ?? dataInternal;
+  const loading = loadingProp ?? loadingInternal;
+  const error = errorProp ?? errorInternal;
+
+  // loading / error: for compact, keep it minimal
   if (compact) {
     if (loading || error || !data) {
       return (
@@ -75,28 +102,16 @@ export default function StoreHoursWidget({ compact = false }: StoreHoursWidgetPr
   const isOpen = openStatus === 1;
 
   if (compact) {
-       return (
-         <div className="flex items-center text-[#FFFFFF]">
-           {/* always show just the clock & status text on xs */}
-           <Clock
-             className={`h-4 w-4 ${
-               isOpen ? 'text-[#22C55E]' : 'text-[#EF4444]'
-             }`}
-           />
-    
-           <span className="ml-1 text-s font-medium">
-             {isOpen ? 'Open' : 'Closed'}
-           </span>
-    
-           {/* show hours at md+ */}
-           <span className="ml-1 text-x text-[#FFFFFF] hidden md:inline">
-             · {todayHours.split(',').join(' | ')}
-           </span>
-         </div>
-       );
+    return (
+      <div className="flex items-center text-[#FFFFFF]">
+        <Clock className={`h-4 w-4 ${isOpen ? 'text-[#22C55E]' : 'text-[#EF4444]'}`} />
+        <span className="ml-1 text-s font-medium">{isOpen ? 'Open' : 'Closed'}</span>
+        <span className="ml-1 text-x text-[#FFFFFF] hidden md:inline">· {todayHours.split(',').join(' | ')}</span>
+      </div>
+    );
   }
 
-  // full version (unchanged)
+  // full version
   return (
     <div className="bg-[#F2EAE2] p-6 rounded-2xl w-full border border-[#EAE0DA]">
       <div className="flex items-center space-x-2 mb-2">
