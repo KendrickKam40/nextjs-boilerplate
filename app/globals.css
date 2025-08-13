@@ -1,9 +1,12 @@
-/* globals.css */
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Montserrat:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-serif: 'Oswald', sans-serif;
+  --font-sans: 'Montserrat', sans-serif;
 }
 
 /* retain your colour variables so API colours can override if needed */
@@ -26,13 +29,13 @@ body {
   /* Always start from a clean white canvas */
   background: #ffffff;
   color: var(--foreground);
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  font-family: var(--font-sans);
   font-weight: 400;
 }
 
 /* Bold, serif headings reminiscent of Staays editorial tone */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Georgia', serif;
+  font-family: var(--font-serif);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--foreground);
@@ -44,6 +47,6 @@ h1.banner{
 
 /* Ensure other text elements use your sans-serif body font */
 p, a, span, li {
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  font-family: var(--font-sans);
   font-weight: 400;
 }

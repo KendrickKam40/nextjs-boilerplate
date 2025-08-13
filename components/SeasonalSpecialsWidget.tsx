@@ -12,6 +12,7 @@ interface MenuResponse {
     price: number;
     showCase: boolean;
     order: number;
+    showOnDisplay: boolean;
   }>;
 }
 
@@ -26,10 +27,11 @@ interface SeasonalSpecialsWidgetProps {
   menuItems: MenuResponse['menuItems'];
 }
 
-export default function SeasonalSpecialsWidget({ coverImage, menuItems }: SeasonalSpecialsWidgetProps) {
+export default function SeasonalSpecialsWidget({ coverImage, menuItems = [] }: SeasonalSpecialsWidgetProps) {
+
   const specials = useMemo<Special[]>(() => {
-    return (menuItems ?? [])
-      .filter(item => item.showCase)
+    return menuItems
+      .filter(item => item.showOnDisplay)
       .sort((a, b) => a.order - b.order)
       .slice(0, 4)
       .map(item => ({

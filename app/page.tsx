@@ -2,7 +2,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
+import NextImage from 'next/image';
 import dynamic from 'next/dynamic';
 
 import Button from '@/components/Button';
@@ -53,7 +53,7 @@ export default function HomePage() {
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [activeModal, setActiveModal] =  useState<'about' | 'points' | 'order' | 'booking' |''>('');
-  const [isBgLoaded, setIsBgLoaded] = useState(false);
+  const [isBgReady, setIsBgReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState<string>('#d6112c');
   const [secondaryColor, setSecondaryColor] = useState('#9a731e');
 
@@ -117,9 +117,32 @@ export default function HomePage() {
     return (fromApi && fromApi.trim().length > 0) ? fromApi.trim() : fallback;
   }, [clientData]);
 
-  // Reset background image loading state when bgImage changes
+  // Preload bg image (more robust than relying on onLoadingComplete)
   useEffect(() => {
-    setIsBgLoaded(false);
+    setIsBgReady(false);
+    if (!bgImage) return;
+
+    // Create a manual Image to trigger onload even for cached images in Safari
+    const img = new window.Image();
+    // Hint the browser this image can be decoded off the main thread
+    // (ignored by some browsers but harmless)
+    // @ts-ignore
+    img.decoding = 'async';
+    img.onload = () => setIsBgReady(true);
+    img.onerror = () => {
+      // Fail open: don't leave users stuck on a grey screen
+      setIsBgReady(true);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Hero bg failed to load:', bgImage);
+      }
+    };
+    img.src = bgImage;
+
+    return () => {
+      // prevent state updates after unmount
+      img.onload = null as any;
+      img.onerror = null as any;
+    };
   }, [bgImage]);
 
   const options: MenuOption[] = [
@@ -174,19 +197,22 @@ export default function HomePage() {
           {/* Background image & overlay */}
           <div className="absolute inset-0 overflow-hidden">
             {/* Placeholder while the real image loads */}
-            {!isBgLoaded && (
+            {!isBgReady && (
               <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center" />
             )}
 
             {/* Animated wrapper so transforms apply reliably */}
-            <div className={`absolute inset-0 transition-opacity duration-500 kenburns ${isBgLoaded ? 'opacity-100' : 'opacity-0'}`}>
-              <Image
+            <div className={`absolute inset-0 transition-opacity duration-500 kenburns ${isBgReady ? 'opacity-100' : 'opacity-0'}`}>
+              <NextImage
+                key={bgImage}            // force remount when URL changes
                 src={bgImage}
                 alt="Hero background"
                 fill
+                sizes="100vw"           // help responsive loading
+                fetchPriority="high"    // hint critical priority
                 className="object-cover"
                 priority
-                onLoadingComplete={() => setIsBgLoaded(true)}
+                onLoad={() => setIsBgReady(true)}
               />
             </div>
 
@@ -196,7 +222,7 @@ export default function HomePage() {
           {/* Content */}
           <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 flex flex-col items-center text-white text-center gap-6">
             <div className="w-full max-w-2xl mx-auto space-y-6">
-              <Image
+              <NextImage
                 src="/BalibuLogoLight.png"
                 alt="Balibu Logo"
                 width={400}
@@ -248,6 +274,8 @@ export default function HomePage() {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 @media (max-width: 640px) {
   .kenburns { -webkit-animation-duration: 32s; animation-duration: 32s; }
@@ -265,7 +293,7 @@ export default function HomePage() {
         {/* ─── OUR STORY ────────────────────────────────────────────────────── */}
         <section
           id="about"
-          className="bg-[#FFFFFF] py-16" // soft, vibrant backdrop reminiscent of Staays’ Stories section
+          className="bg-[#faf3ea] py-16" // soft, vibrant backdrop reminiscent of Staays’ Stories section
         >
           <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
             <h2 className="text-4xl font-serif font-bold text-[#24333F]">
@@ -273,7 +301,7 @@ export default function HomePage() {
             </h2>
             {/* Prominent image with rounded corners and shadow */}
             <div className="relative mx-auto w-full h-64 sm:h-72 md:h-80 rounded-2xl overflow-hidden shadow-md">
-              <Image
+              <NextImage
                 src="/OURSTORY_Pic.jpg"
                 alt="Our history"
                 fill
@@ -324,7 +352,7 @@ export default function HomePage() {
         >
           <div className="space-y-4">
             <div className="relative w-full h-40 sm:h-60 overflow-hidden rounded-2xl">
-              <Image
+              <NextImage
                 src="/OURSTORY_Pic.jpg"
                 alt="bgImage"
                 fill

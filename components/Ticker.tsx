@@ -50,6 +50,7 @@ export default function Ticker({ phrase }: { phrase: string }) {
           line-height: 1;             /* avoid vertical overlap */
           color: #d6112c;
           font-size: 1.6em;
+          font-family: var(--font-serif);
           -webkit-font-smoothing: antialiased;
         }
 
