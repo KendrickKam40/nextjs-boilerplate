@@ -341,7 +341,10 @@ export default function HomePage() {
               <div className='flex justify-center'>
                 <StoreHoursWidget
                   compact
-                  data={{ openTimes: clientData?.openTimes, openStatus: clientData?.openStatus }}
+                  data={{
+                    openTimes: clientData?.openTimes ?? {},
+                    openStatus: clientData?.openStatus ?? 0
+                  }}
                   loading={false} // or your page-level loading flag
                   error={null}
                 />
