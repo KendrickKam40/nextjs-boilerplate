@@ -238,15 +238,22 @@ export default function CategoryCarousel({
   // Items to show in modal for selected category
   const itemsForSelected = useMemo(() => {
     if (!selectedCategory) return [];
-    const target = selectedCategory.trim().toLowerCase();
+    const targetSlug = slugify(selectedCategory);
 
     return (menuItems || [])
-      .filter((it: any) =>
-        (it.category || '').trim().toLowerCase() === target &&
-        it.showOnKiosk === true &&
-        it.soldOut !== 1
-      )
-      .sort((a, b) => (a.order || 0) - (b.order || 0) || a.name.localeCompare(b.name));
+      .filter((it: any) => {
+        const catSlug = slugify(it?.category || '');
+        // const kioskOk = it?.showOnKiosk === true;       // per your requirement
+        const soldOut = Number(it?.soldOut) === 1;      // handles '1' or 1
+        const avalible = Number(it?.avalible) === 0; // 0 means available
+        return catSlug === targetSlug && soldOut  && avalible;
+      })
+      .sort((a: any, b: any) => {
+        const ao = Number.isFinite(a?.order) ? a.order : 9999;
+        const bo = Number.isFinite(b?.order) ? b.order : 9999;
+        if (ao !== bo) return ao - bo;
+        return String(a?.name || '').localeCompare(String(b?.name || ''));
+      });
   }, [selectedCategory, menuItems]);
 
   return (

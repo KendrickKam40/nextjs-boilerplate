@@ -219,15 +219,26 @@ export default function HomePage() {
       return vis && daysOk && timeOk;
     });
 
+    const slugify = (s: string) =>
+      (s || '')
+        .toLowerCase()
+        .trim()
+        .replace(/&/g, ' and ')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9\-]/g, '')
+        .replace(/-+/g, '-');
+
     // Filter out categories with no menu items (case-insensitive, trimmed match)
     const menuItems = menuData?.menuItems ?? [];
     filtered = filtered.filter(cat => {
-    const catName = (cat.name || '').trim().toLowerCase();
-    return menuItems?.some(it =>
-      it.avalible === 0 &&
-      it.category?.trim().toLowerCase() === catName
-    );
-  });
+      const catName = (cat.name || '').trim().toLowerCase();
+      return menuItems?.some(it =>
+        it.avalible === 0 &&
+        it.category?.trim().toLowerCase() === catName
+      );
+     
+    });
+
 
     // uniquify by name, then sort
     const map = new Map<string, Category>();
@@ -248,22 +259,24 @@ export default function HomePage() {
   }, [categoriesData, menuData]);
 
   const imagesByCategory = useMemo(() => {
+    const slugify = (s: string) =>
+      (s || '')
+        .toLowerCase()
+        .trim()
+        .replace(/&/g, ' and ')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9\-]/g, '')
+        .replace(/-+/g, '-');
+
     const map: Record<string, string> = {};
     const cats = topCategories || [];
-    
+
     for (const cat of cats) {
       const rawName = (cat?.name || '').trim().toLowerCase();
       if (!rawName) continue;
-      
-      // Create a slug for the filename
-      const slug = rawName
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9\-]/g, '');
-
+      const slug = slugify(rawName);
       map[rawName] = `/images/categories/balinese/${slug}.png`;
     }
-
-    console.log('Images by category:', map);
 
     return map;
   }, [topCategories]);
