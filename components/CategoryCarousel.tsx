@@ -149,6 +149,19 @@ export default function CategoryCarousel({
   const [canRight, setCanRight] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  // Track image load failures so we can gracefully fall back
+  const [imgFailures, setImgFailures] = useState<Record<string, true>>({});
+
+  // Slugify category names to map to local fallback images
+  const slugify = (s: string) =>
+    (s || '')
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, ' and ')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9\-]/g, '')
+      .replace(/-+/g, '-');
+
   // Deterministic helpers
   const hashCode = (str: string) => {
     let h = 0;
@@ -156,12 +169,27 @@ export default function CategoryCarousel({
     return Math.abs(h);
   };
   const pickImageFor = (name: string) => {
-    const explicit = imagesByCategory?.[name];
+    const key = name.trim().toLowerCase();
+    const explicit = imagesByCategory?.[key];
     if (explicit) return explicit;
+
+    // Try slug-based local image (preferred fallback): /public/images/categories/balinese/<slug>.png
+    const slug = slugify(name);
+    const candidatePng = `/images/categories/balinese/${slug}.png`;
+    if (!imgFailures[candidatePng]) return candidatePng;
+
+    // Try jpg as a secondary fallback
+    const candidateJpg = `/images/categories/balinese/${slug}.jpg`;
+    if (!imgFailures[candidateJpg]) return candidateJpg;
+
+    // Final fallback: deterministic pick from provided pool (if any)
     if (images && images.length > 0) {
       const idx = hashCode(name) % images.length;
-      return images[idx];
+      const pooled = images[idx];
+      if (!imgFailures[pooled]) return pooled;
     }
+
+    // No image available or all failed
     return '';
   };
   const initials = (name: string) => {
@@ -209,16 +237,17 @@ export default function CategoryCarousel({
 
   // Items to show in modal for selected category
   const itemsForSelected = useMemo(() => {
-  if (!selectedCategory) return [];
-  const target = selectedCategory.trim().toLowerCase();
-  
-  return (menuItems || [])
-    .filter(it =>
-      it.avalible === 0 &&
-      (it.category || '').trim().toLowerCase() === target
-    )
-    .sort((a, b) => (a.order || 0) - (b.order || 0) || a.name.localeCompare(b.name));
-}, [selectedCategory, menuItems]);
+    if (!selectedCategory) return [];
+    const target = selectedCategory.trim().toLowerCase();
+
+    return (menuItems || [])
+      .filter((it: any) =>
+        (it.category || '').trim().toLowerCase() === target &&
+        it.showOnKiosk === true &&
+        it.soldOut !== 1
+      )
+      .sort((a, b) => (a.order || 0) - (b.order || 0) || a.name.localeCompare(b.name));
+  }, [selectedCategory, menuItems]);
 
   return (
     <section className="bg-[#ffffff] py-16">
@@ -261,6 +290,7 @@ export default function CategoryCarousel({
                   className="card relative snap-start shrink-0 rounded-2xl overflow-hidden bg-[#f1e7da] shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label={cat.name}
                 >
+                  {/* Image priority: explicit map -> /images/categories/balinese/<slug>.{png|jpg} -> pooled -> initials */}
                   {img ? (
                     <NextImage
                       src={img}
@@ -269,6 +299,7 @@ export default function CategoryCarousel({
                       className="object-cover"
                       sizes="(max-width: 640px) 260px, 300px"
                       priority={i < 3}
+                      onError={() => setImgFailures((m) => ({ ...m, [img]: true }))}
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center" style={{ background: gradientFor(cat.name) }}>
@@ -284,7 +315,7 @@ export default function CategoryCarousel({
                   {/* label */}
                   <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white p-4">
                     <p className="text-xs tracking-[0.2em] uppercase opacity-80">Category</p>
-                    <h3 className="text-xl font-serif font-bold">{cat.name}</h3>
+                    <h3 className="text-xl font-serif font-bold category-white">{cat.name}</h3>
                   </div>
                 </article>
               );

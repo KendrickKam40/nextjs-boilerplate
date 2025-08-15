@@ -247,6 +247,27 @@ export default function HomePage() {
       // .slice(0, 5);
   }, [categoriesData, menuData]);
 
+  const imagesByCategory = useMemo(() => {
+    const map: Record<string, string> = {};
+    const cats = topCategories || [];
+    
+    for (const cat of cats) {
+      const rawName = (cat?.name || '').trim().toLowerCase();
+      if (!rawName) continue;
+      
+      // Create a slug for the filename
+      const slug = rawName
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9\-]/g, '');
+
+      map[rawName] = `/images/categories/balinese/${slug}.png`;
+    }
+
+    console.log('Images by category:', map);
+
+    return map;
+  }, [topCategories]);
+
   // Preload bg image (more robust than relying on onLoadingComplete)
   useEffect(() => {
     setIsBgReady(false);
@@ -477,8 +498,7 @@ export default function HomePage() {
             heading="Explore by Category"
             subheading="From IndoFusion bowls to sweet treats — browse by what you’re craving."
             categories={topCategories}
-            // images={clientData?.littlesImages ?? []}
-            // imagesByCategory={{ 'Smoothies': '/imgs/smoothies.jpg' }}
+            imagesByCategory={imagesByCategory}
             onAllClick={() => setActiveModal('order')}
             primaryColor={primaryColor}
             menuItems={menuData?.menuItems}

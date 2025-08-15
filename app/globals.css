@@ -45,6 +45,10 @@ h1.banner{
   color: #ffffff;
 }
 
+h3.category-white {
+  color: #ffffff;
+}
+
 /* Ensure other text elements use your sans-serif body font */
 p, a, span, li {
   font-family: var(--font-sans);
