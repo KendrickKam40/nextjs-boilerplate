@@ -465,23 +465,25 @@ export default function HomePage() {
 
         {/* ─── SEASONAL OFFERS ──────────────────────────────────────────────── */}
 
-        {clientData && menuData && hasShowcase ? (
+        {clientData && menuData && hasShowcase && (
           <SeasonalSpecialsWidget
             coverImage={'/seasonalSpecials.JPG'}
             menuItems={menuData?.menuItems}
           />
-        ) : (clientData && topCategories.length > 0 ? (
+        )}
+
+        {clientData && topCategories.length > 0 && (
           <CategoryCarousel
             heading="Explore by Category"
             subheading="From IndoFusion bowls to sweet treats — browse by what you’re craving."
             categories={topCategories}
-            // images={clientData?.littlesImages ?? []}   // optional: can omit entirely
-            // imagesByCategory={{ 'Smoothies': '/imgs/smoothies.jpg' }} // optional fine control
+            // images={clientData?.littlesImages ?? []}
+            // imagesByCategory={{ 'Smoothies': '/imgs/smoothies.jpg' }}
             onAllClick={() => setActiveModal('order')}
             primaryColor={primaryColor}
             menuItems={menuData?.menuItems}
           />
-        ) : null)}  
+        )}
 
         {clientData && (
           <div id="contact" className="max-w-6xl mx-auto my-12 sm:my-16 px-4 space-y-6">
