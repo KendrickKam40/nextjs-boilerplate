@@ -43,12 +43,15 @@ export default function StoreHoursWidget({ compact = false, data: dataProp = nul
       try {
         setLoadingInternal(true);
         setErrorInternal(null);
-        const res = await fetch('/api/client', {
-          next: { revalidate: 3600 }, // 1 hour
-        });
+        const res = await fetch('/api/client', { cache: 'no-store' }); // always fresh for status
         if (!res.ok) throw new Error('Network response was not ok');
-        const client = (await res.json()) as ClientData;
-        if (!cancelled) setDataInternal(client);
+        const boot = (await res.json()) as { client?: any };
+        const c = boot?.client ?? {};
+        const normalized: ClientData = {
+          openTimes: (c.openTimes ?? {}) as Record<string, string>,
+          openStatus: Number(c.openStatus ?? 0),
+        };
+        if (!cancelled) setDataInternal(normalized);
       } catch (err: any) {
         if (!cancelled) setErrorInternal(err.message);
       } finally {
@@ -98,7 +101,8 @@ export default function StoreHoursWidget({ compact = false, data: dataProp = nul
   const { openTimes, openStatus } = data!;
   const now = new Date();
   const todayName = now.toLocaleDateString('en-AU', { weekday: 'long' });
-  const todayHours = openTimes[todayName] || 'Closed';
+  const rawToday = openTimes?.[todayName];
+  const todayHours = typeof rawToday === 'string' && rawToday.trim() ? rawToday : 'Closed';
   const isOpen = openStatus === 1;
 
   if (compact) {

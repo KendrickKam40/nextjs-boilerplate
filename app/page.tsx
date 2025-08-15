@@ -286,7 +286,7 @@ export default function HomePage() {
 
   const options: MenuOption[] = [
     { label: 'Order Online', onClick: () => setActiveModal('order') },
-    { label: 'Our Story',   onClick: () => setActiveModal('about') },
+    { label: 'Book Online',   onClick: () => setActiveModal('booking') },
   ];
 
   // If page is still loading, show a skeleton
@@ -447,7 +447,7 @@ export default function HomePage() {
               Our Story
             </h2>
             {/* Prominent image with rounded corners and shadow */}
-            <div className="relative mx-auto w-full h-64 sm:h-72 md:h-80 rounded-2xl overflow-hidden shadow-md">
+            <div className="relative mx-auto w-full h-120 sm:h-72 md:h-120 rounded-2xl overflow-hidden shadow-md">
               <NextImage
                 src="/OURSTORY_Pic.jpg"
                 alt="Our history"
