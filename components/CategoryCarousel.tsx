@@ -151,6 +151,30 @@ export default function CategoryCarousel({
 
   // Track image load failures so we can gracefully fall back
   const [imgFailures, setImgFailures] = useState<Record<string, true>>({});
+  // Cache of validated image URLs (true = valid, false = invalid)
+  const [imgValid, setImgValid] = useState<Record<string, boolean>>({});
+  // In-flight validation promises to dedupe HEAD requests
+  const imgValidating = useRef<Record<string, Promise<boolean> | undefined>>({});
+
+  // Default fallback image to use when category-specific images are missing
+  const DEFAULT_CATEGORY_IMG = '/images/categories/default.png';
+
+  // Known files in public/images/categories/balinese (avoid HEADing missing files)
+  const AVAILABLE_BALI_SLUGS = new Set([
+    'beef-dishes',
+    'chicken-dishes',
+    'milkshakes',
+    'rice-and-noodles',
+    'sauces',
+    'slushies-and-ice-tea',
+    'smoothies',
+    'snacks',
+    'soft-drinks',
+    'soft-serve-ice-cream-and-yoghurt',
+    'sundaes-vanilla-soft-serve',
+    'sundaes-yoghurt-soft-serve',
+    'vegetarian',
+  ]);
 
   // Slugify category names to map to local fallback images
   const slugify = (s: string) =>
@@ -168,26 +192,62 @@ export default function CategoryCarousel({
     for (let i = 0; i < str.length; i++) h = (h << 5) - h + str.charCodeAt(i);
     return Math.abs(h);
   };
+  // Helper that checks whether a URL is a valid image by fetching its headers
+  // We only fetch once per URL and cache the result in imgValid.
+  const validateImage = async (url: string) => {
+    if (!url) return false;
+    if (typeof window === 'undefined') return false;
+    if (imgValid[url] === true) return true;
+    if (imgValid[url] === false) return false;
+    // If another call already started validation for this URL, reuse it
+    if (imgValidating.current[url]) return imgValidating.current[url];
+
+    const p = (async () => {
+      try {
+        const res = await fetch(url, { method: 'HEAD' });
+        const ok = res.ok && /^image\//.test(res.headers.get('content-type') || '');
+        setImgValid((m) => ({ ...m, [url]: ok }));
+        if (!ok) setImgFailures((m) => ({ ...m, [url]: true }));
+        return ok;
+      } catch (e) {
+        setImgValid((m) => ({ ...m, [url]: false }));
+        setImgFailures((m) => ({ ...m, [url]: true }));
+        return false;
+      } finally {
+        // cleanup in-flight map
+        // use microtask to avoid React state updates inside finally causing issues
+        setTimeout(() => { delete imgValidating.current[url]; }, 0);
+      }
+    })();
+
+    imgValidating.current[url] = p;
+    return p;
+  };
+
   const pickImageFor = (name: string) => {
     const key = name.trim().toLowerCase();
     const explicit = imagesByCategory?.[key];
-    if (explicit) return explicit;
+  // Prefer explicit mapping only if we've validated it as an image
+  if (explicit && imgValid[explicit] === true) return explicit;
 
     // Try slug-based local image (preferred fallback): /public/images/categories/balinese/<slug>.png
     const slug = slugify(name);
-    const candidatePng = `/images/categories/balinese/${slug}.png`;
-    if (!imgFailures[candidatePng]) return candidatePng;
+  const candidatePng = `/images/categories/balinese/${slug}.png`;
+  if (AVAILABLE_BALI_SLUGS.has(slug) && imgValid[candidatePng] === true) return candidatePng;
 
     // Try jpg as a secondary fallback
-    const candidateJpg = `/images/categories/balinese/${slug}.jpg`;
-    if (!imgFailures[candidateJpg]) return candidateJpg;
+  const candidateJpg = `/images/categories/balinese/${slug}.jpg`;
+  if (AVAILABLE_BALI_SLUGS.has(slug) && imgValid[candidateJpg] === true) return candidateJpg;
 
     // Final fallback: deterministic pick from provided pool (if any)
     if (images && images.length > 0) {
       const idx = hashCode(name) % images.length;
       const pooled = images[idx];
-      if (!imgFailures[pooled]) return pooled;
+      if (pooled && imgValid[pooled] === true) return pooled;
     }
+
+    // As last resort use a default category image (only if validated)
+    if (imgValid[DEFAULT_CATEGORY_IMG] === true) return DEFAULT_CATEGORY_IMG;
 
     // No image available or all failed
     return '';
@@ -226,6 +286,57 @@ export default function CategoryCarousel({
       ro.disconnect();
     };
   }, []);
+
+  // Pre-validate candidate images for the currently visible categories so we avoid
+  // returning URLs that will 404 or return HTML (which causes the 'invalid image' console error).
+  useEffect(() => {
+    const candidates: string[] = [];
+    categories.slice(0, 12).forEach((c) => {
+      const name = c.name || '';
+      const key = name.trim().toLowerCase();
+      const explicit = imagesByCategory?.[key];
+      if (explicit) {
+        // If explicit mapping points to a balinese slug, only validate when slug exists
+        const m = explicit.match(/\/images\/categories\/balinese\/([^./]+)\.(png|jpe?g)$/i);
+        if (m) {
+          const explicitSlug = m[1];
+          if (AVAILABLE_BALI_SLUGS.has(explicitSlug) && !imgValid[explicit] && !imgFailures[explicit]) {
+            candidates.push(explicit);
+          }
+        } else if (!imgValid[explicit] && !imgFailures[explicit]) {
+          candidates.push(explicit);
+        }
+      }
+      const slug = slugify(name);
+      const png = `/images/categories/balinese/${slug}.png`;
+      const jpg = `/images/categories/balinese/${slug}.jpg`;
+      if (AVAILABLE_BALI_SLUGS.has(slug)) {
+        if (!imgValid[png] && !imgFailures[png]) candidates.push(png);
+        if (!imgValid[jpg] && !imgFailures[jpg]) candidates.push(jpg);
+      }
+      if (images && images.length > 0) {
+        const pooled = images[hashCode(name) % images.length];
+        if (pooled && !imgValid[pooled] && !imgFailures[pooled]) candidates.push(pooled);
+      }
+    });
+    // Dedupe candidates and validate sequentially to avoid many parallel requests on slow networks
+    const deduped = Array.from(new Set(candidates));
+    let cancelled = false;
+    (async () => {
+      for (const url of deduped) {
+        if (cancelled) break;
+        // eslint-disable-next-line no-await-in-loop
+        await validateImage(url);
+      }
+      // also validate default image once
+      if (!cancelled && !imgValid[DEFAULT_CATEGORY_IMG] && !imgFailures[DEFAULT_CATEGORY_IMG]) {
+        // fire-and-forget
+        validateImage(DEFAULT_CATEGORY_IMG);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [categories, images, imagesByCategory]);
 
   const scrollByCards = (dir: -1 | 1) => {
     const el = trackRef.current;
