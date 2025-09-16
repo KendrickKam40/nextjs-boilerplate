@@ -4,6 +4,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import NextImage from 'next/image';
 import Button from '@/components/Button';
+import { s } from 'framer-motion/client';
 
 export type Category = {
   name: string;
@@ -174,6 +175,9 @@ export default function CategoryCarousel({
     'sundaes-vanilla-soft-serve',
     'sundaes-yoghurt-soft-serve',
     'vegetarian',
+    'meals',
+    'ice-cream-and-yoghurt',
+    'shakes-smoothies-slushies',
   ]);
 
   // Slugify category names to map to local fallback images
