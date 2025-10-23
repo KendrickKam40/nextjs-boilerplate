@@ -26,13 +26,14 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div
-        className="rounded-2xl shadow-lg mx-4 overflow-hidden bg-white"
+        className="rounded-2xl shadow-lg mx-4 overflow-hidden bg-white max-h-[80vh] md:max-h-[90vh] w-full"
         style={{
           backgroundColor: bgColor,
           color: textColor,
           width,
           maxWidth: '100%',
-          maxHeight: '90vh',            // <-- limit total height
+          // keep an inline fallback for environments without the Tailwind utilities
+          maxHeight: '80vh', // mobile default
         }}
       >
         {/* Header */}
@@ -44,7 +45,7 @@ const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Body (scrollable if too tall) */}
-        <div className="p-4 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 64px)' }}>
+        <div className="p-4 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 64px)' }}>
           {children}
         </div>
       </div>

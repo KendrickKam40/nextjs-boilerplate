@@ -595,8 +595,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Full-viewport iframe */}
-            <div className="w-full" style={{ height: 'calc(100vh - 56px)' }}>
+            {/* Ordering iframe: slightly shorter than full viewport so it doesn't get cut off on mobile */}
+            <div className="w-full" style={{ height: 'calc(90vh - 56px)' }}>
               <iframe
                 src="https://ordering.balibu.co.nz/"
                 title="Order Online"
@@ -605,9 +605,12 @@ export default function HomePage() {
             </div>
 
             <style jsx>{`
+              /* Default: slightly less than full viewport so there's a small margin on large screens */
+              div[role='dialog'] > div + div { height: calc(90vh - 56px); }
+
               @media (max-width: 640px) {
-                /* Ensure the iframe fills under varying header heights on mobile */
-                div[role='dialog'] > div + div { height: calc(100vh - 56px); }
+                /* Mobile: shorter so the popup isn't cut off behind UI chrome */
+                div[role='dialog'] > div + div { height: calc(80vh - 56px); }
               }
             `}</style>
           </div>
