@@ -294,10 +294,19 @@ export default function HomePage() {
     img.decoding = 'async';
     img.onload = () => setIsBgReady(true);
     img.onerror = () => {
-      // Fail open: don't leave users stuck on a grey screen
+      // If the API image fails, fall back to the bundled hero image.
+      const fallback = '/HeroBackground.webp';
+      // Avoid replacing with the same URL repeatedly
+      if (bgImage !== fallback) {
+        // setBgImage will trigger this effect again; the second time it should succeed
+        setBgImage(fallback);
+        return;
+      }
+
+      // Final fallback: mark ready so the page doesn't stay in a loading state
       setIsBgReady(true);
       if (process.env.NODE_ENV !== 'production') {
-        console.warn('Hero bg failed to load:', bgImage);
+        console.warn('Hero bg failed to load (including fallback):', bgImage);
       }
     };
     img.src = bgImage;
