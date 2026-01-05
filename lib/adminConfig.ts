@@ -38,7 +38,8 @@ async function readFromBlob(): Promise<AdminConfig> {
   const { blobs } = await list({ prefix: BLOB_KEY, limit: 1 });
   const hit = blobs.find((b) => b.pathname === BLOB_KEY);
   if (!hit) return {};
-  const res = await fetch(hit.url);
+  // Bypass any CDN caching so the latest order is used
+  const res = await fetch(hit.url, { cache: 'no-store' });
   if (!res.ok) return {};
   return (await res.json()) as AdminConfig;
 }
