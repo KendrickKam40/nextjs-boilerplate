@@ -7,6 +7,9 @@ import type { NextRequest } from 'next/server';
  * Prefer a non-public var for server-only (middleware runs on the edge runtime).
  */
 const COMING_SOON_ENABLED = process.env.COMING_SOON === 'true';
+const DISPLAY_PATH = `/${process.env.DISPLAY_PATH || 'store-display'}`;
+const ADMIN_COOKIE = 'admin_session';
+const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 
 /**
  * Allowlist:
@@ -18,17 +21,79 @@ const COMING_SOON_ENABLED = process.env.COMING_SOON === 'true';
  */
 const PUBLIC_FILE = /\.(.*)$/;
 
-export function middleware(req: NextRequest) {
-    console.log('Middleware running...');
-  if (!COMING_SOON_ENABLED) return NextResponse.next();
+function base64UrlToUint8Array(input: string) {
+  const normalized = input.replace(/-/g, '+').replace(/_/g, '/');
+  const pad = normalized.length % 4 ? 4 - (normalized.length % 4) : 0;
+  const padded = normalized + '='.repeat(pad);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
 
+async function verifyAdminToken(token: string | undefined | null) {
+  if (!token || !ADMIN_SECRET) return false;
+  const parts = token.split('.');
+  if (parts.length !== 3) return false;
+  const [headerB64, payloadB64, sigB64] = parts;
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(ADMIN_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify']
+  );
+  const data = enc.encode(`${headerB64}.${payloadB64}`);
+  const sig = base64UrlToUint8Array(sigB64);
+  const ok = await crypto.subtle.verify('HMAC', key, sig, data);
+  if (!ok) return false;
+
+  try {
+    const json = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
+    const exp = json?.exp;
+    const sub = json?.sub;
+    if (sub !== 'admin') return false;
+    if (typeof exp !== 'number' || exp < Date.now() / 1000) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function middleware(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
+
+  // Protect admin pages and APIs with presence of session cookie (allow login endpoints)
+  const isAdminArea = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
+  const isLoginPath = pathname === '/admin/login' || pathname === '/api/admin/login';
+  if (isAdminArea && !isLoginPath) {
+    const token = req.cookies.get(ADMIN_COOKIE)?.value;
+    const isValid = await verifyAdminToken(token);
+    if (!isValid) {
+      if (pathname.startsWith('/api')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      const url = req.nextUrl.clone();
+      url.pathname = '/admin/login';
+      url.searchParams.set('next', pathname);
+      return NextResponse.redirect(url);
+    }
+    // Let authenticated admin traffic through
+    return NextResponse.next();
+  }
+
+  if (!COMING_SOON_ENABLED) return NextResponse.next();
 
   // 1) Always let core/internal and explicit allowlist paths through
   if (
     pathname.startsWith('/coming-soon') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
+    pathname === DISPLAY_PATH ||
+    pathname.startsWith('/admin') ||
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();
