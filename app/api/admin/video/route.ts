@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { getAdminCookieName, verifySessionToken } from '@/lib/auth';
-import { getVideoUrlsFromConfig, readAdminConfig, writeAdminConfig } from '@/lib/adminConfig';
+import { sql } from '@/lib/db';
 
 function isValidUrl(url: string) {
   try {
@@ -22,9 +22,27 @@ async function requireAdmin() {
   return null;
 }
 
+async function readPlaylist(): Promise<string[]> {
+  const rows = await sql<{ url: string }[]>`SELECT url FROM playlist_items ORDER BY position ASC`;
+  return rows.map((r) => r.url);
+}
+
+async function writePlaylist(urls: string[]) {
+  const positions = urls.map((_, idx) => idx);
+  await sql.transaction([
+    sql`DELETE FROM playlist_items`,
+    urls.length
+      ? sql`
+          INSERT INTO playlist_items (position, url)
+          SELECT * FROM UNNEST(${positions}::int4[], ${urls}::text[])
+        `
+      : sql`SELECT 1`,
+  ]);
+}
+
 export async function GET() {
-  const config = await readAdminConfig();
-  return NextResponse.json({ videoUrls: getVideoUrlsFromConfig(config) });
+  const urls = await readPlaylist();
+  return NextResponse.json({ videoUrls: urls });
 }
 
 export async function POST(req: Request) {
@@ -52,6 +70,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Invalid https URL: ${invalid}` }, { status: 422 });
   }
 
-  await writeAdminConfig({ videoUrls: cleaned });
+  await writePlaylist(cleaned);
   return NextResponse.json({ ok: true, videoUrls: cleaned });
 }
