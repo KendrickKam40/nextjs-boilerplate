@@ -30,7 +30,7 @@ function toPlaylistEmbed(urls: string[]) {
 }
 
 export default async function StoreDisplayPage() {
-  const rows = await sql<{ url: string }[]>`SELECT url FROM playlist_items ORDER BY position ASC`;
+  const rows = await sql<{ url: string }>`SELECT url FROM playlist_items ORDER BY position ASC`;
   const videoUrls = rows.map((r) => r.url);
   const embed = toPlaylistEmbed(videoUrls);
 
