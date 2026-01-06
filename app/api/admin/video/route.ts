@@ -23,7 +23,7 @@ async function requireAdmin() {
 }
 
 async function readPlaylist(): Promise<string[]> {
-  const rows = await sql<{ url: string }>`SELECT url FROM playlist_items ORDER BY position ASC`;
+  const rows = (await sql`SELECT url FROM playlist_items ORDER BY position ASC`) as { url: string }[];
   return rows.map((r) => r.url);
 }
 
