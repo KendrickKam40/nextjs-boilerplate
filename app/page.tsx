@@ -385,17 +385,19 @@ export default function HomePage() {
 
             {/* Animated wrapper so transforms apply reliably */}
             <div className={`absolute inset-0 transition-opacity duration-500 kenburns ${isBgReady ? 'opacity-100' : 'opacity-0'}`}>
-              <NextImage
-                key={bgImage}            // force remount when URL changes
-                src={bgImage}
-                alt="Hero background"
-                fill
-                sizes="100vw"           // help responsive loading
-                fetchPriority="high"    // hint critical priority
-                className="object-cover"
-                priority
-                onLoad={() => setIsBgReady(true)}
-              />
+              {isBgReady && bgImage && (
+                <NextImage
+                  key={bgImage}            // force remount when URL changes
+                  src={bgImage}
+                  alt="Hero background"
+                  fill
+                  sizes="100vw"           // help responsive loading
+                  fetchPriority="high"    // hint critical priority
+                  className="object-cover"
+                  priority
+                  onLoad={() => setIsBgReady(true)}
+                />
+              )}
             </div>
 
             <div className="absolute inset-0 bg-black/60" />
