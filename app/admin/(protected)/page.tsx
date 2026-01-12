@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Eye, EyeOff, Trash2 } from 'lucide-react';
+import Modal from '@/components/Modal';
 import { useRouter } from 'next/navigation';
 
 type VideoItem = { id: string; url: string };
@@ -124,6 +125,8 @@ export default function AdminDashboard() {
   const [layoutDropIndex, setLayoutDropIndex] = useState<number | null>(null);
   const layoutPreviewRef = useRef<HTMLDivElement>(null);
   const [previewNonce, setPreviewNonce] = useState(0);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [restoreTarget, setRestoreTarget] = useState<LayoutHistoryItem | null>(null);
   const layoutPreviewQuery = useMemo(
     () => encodeURIComponent(JSON.stringify({ items: layoutItems })),
     [layoutItems]
@@ -312,8 +315,10 @@ export default function AdminDashboard() {
       setLayoutStatus({ type: 'success', message: 'Layout restored.' });
       await loadLayout();
       setPreviewNonce((value) => value + 1);
+      return true;
     } catch (err: any) {
       setLayoutStatus({ type: 'error', message: err?.message || 'Restore failed' });
+      return false;
     } finally {
       setLayoutSaving(false);
     }
@@ -450,10 +455,10 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[#f7f7f7]">
       <header className="border-b bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-500">Admin</p>
-            <h1 className="text-2xl font-bold">Display Settings</h1>
+            <p className="text-sm text-gray-500">Settings</p>
+            <h1 className="text-2xl font-bold">Site Settings</h1>
           </div>
           <button
             onClick={logout}
@@ -924,55 +929,30 @@ export default function AdminDashboard() {
                 )}
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <button
-                    type="button"
-                    onClick={saveLayout}
-                    disabled={layoutSaving}
-                    className="rounded-lg bg-gray-900 text-white px-4 py-2 font-semibold hover:bg-gray-800 disabled:opacity-60 flex items-center gap-2"
-                  >
-                    <span aria-hidden>💾</span>
-                    {layoutSaving ? 'Saving...' : 'Save layout'}
-                  </button>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={saveLayout}
+                      disabled={layoutSaving}
+                      className="rounded-lg bg-gray-900 text-white px-4 py-2 font-semibold hover:bg-gray-800 disabled:opacity-60 flex items-center gap-2"
+                    >
+                      <span aria-hidden>💾</span>
+                      {layoutSaving ? 'Saving...' : 'Save layout'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHistoryOpen(true)}
+                      className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                    >
+                      View history
+                    </button>
+                  </div>
                   {layoutStatus.type === 'success' && (
                     <span className="text-sm text-green-700">{layoutStatus.message}</span>
                   )}
                   {layoutStatus.type === 'error' && (
                     <span className="text-sm text-red-600">{layoutStatus.message}</span>
                   )}
-                </div>
-
-                <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                    History
-                  </h3>
-                  <div className="space-y-2">
-                    {layoutHistory.length === 0 && (
-                      <p className="text-sm text-gray-500">No layout history yet.</p>
-                    )}
-                    {layoutHistory.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="flex flex-col gap-2 rounded-lg border border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">
-                            {new Date(entry.created_at).toLocaleString()}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {entry.created_by || 'admin'} • {entry.layout?.items?.length || 0} sections
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => restoreLayout(entry.id)}
-                          disabled={layoutSaving}
-                          className="text-sm font-semibold text-gray-900 hover:underline disabled:opacity-60"
-                        >
-                          Restore
-                        </button>
-                      </div>
-                    ))}
-                  </div>
                 </div>
 
                 <div className="space-y-3">
@@ -1015,6 +995,87 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
+
+                <Modal
+                  open={historyOpen && !restoreTarget}
+                  title="Layout history"
+                  onClose={() => setHistoryOpen(false)}
+                >
+                  <div className="space-y-3">
+                    {layoutHistory.length === 0 && (
+                      <p className="text-sm text-gray-500">No layout history yet.</p>
+                    )}
+                    {layoutHistory.map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="flex flex-col gap-2 rounded-lg border border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {new Date(entry.created_at).toLocaleString()}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {entry.created_by || 'admin'} • {entry.layout?.items?.length || 0} sections
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setRestoreTarget(entry)}
+                          disabled={layoutSaving}
+                          className="text-sm font-semibold text-gray-900 hover:underline disabled:opacity-60"
+                        >
+                          Restore
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Modal>
+
+                <Modal
+                  open={Boolean(restoreTarget)}
+                  title="Restore this layout?"
+                  onClose={() => setRestoreTarget(null)}
+                >
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600">
+                      This will replace the current homepage layout with the selected version.
+                    </p>
+                    {restoreTarget && (
+                      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+                        <p className="font-semibold text-gray-900">
+                          {new Date(restoreTarget.created_at).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {restoreTarget.created_by || 'admin'} • {restoreTarget.layout?.items?.length || 0} sections
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap items-center justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setRestoreTarget(null)}
+                        className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        disabled={layoutSaving || !restoreTarget}
+                        onClick={async () => {
+                          if (!restoreTarget) return;
+                          const ok = await restoreLayout(restoreTarget.id);
+                          if (ok) {
+                            setRestoreTarget(null);
+                            setHistoryOpen(false);
+                          }
+                        }}
+                        className="rounded-lg bg-gray-900 text-white px-4 py-2 text-sm font-semibold hover:bg-gray-800 disabled:opacity-60"
+                      >
+                        {layoutSaving ? 'Restoring...' : 'Confirm restore'}
+                      </button>
+                    </div>
+                  </div>
+                </Modal>
               </section>
             )}
           </div>

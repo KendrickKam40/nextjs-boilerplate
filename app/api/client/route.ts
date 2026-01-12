@@ -64,6 +64,12 @@ const getCachedStatic = unstable_cache(fetchStatic, ['bootstrap-static-v1'], {
   revalidate: 1800,
 });
 
+const getCachedLayoutHome = unstable_cache(
+  async () => readCurrentLayout('home'),
+  ['layout-home-v1'],
+  { revalidate: 60 }
+);
+
 // ---- DYNAMIC (no-store) fetch: always fresh ----
 async function fetchDynamic(): Promise<{ clientFlags: Partial<AnyObj>; menuItems: AnyObj[] }> {
   const res = await fetch(UPSTREAM, {
@@ -97,7 +103,7 @@ export async function GET() {
       getCachedStatic(),
       fetchDynamic(),
       readThemeOverrides().catch(() => ({})),
-      readCurrentLayout('home').catch(() => ({ versionId: null, layout: DEFAULT_LAYOUTS.home })),
+      getCachedLayoutHome().catch(() => ({ versionId: null, layout: DEFAULT_LAYOUTS.home })),
     ]);
 
     // Merge: static client + override volatile fields with dynamic snapshot
@@ -120,7 +126,7 @@ export async function GET() {
       const [stat, overrides, layoutResult] = await Promise.all([
         getCachedStatic(),
         readThemeOverrides().catch(() => ({})),
-        readCurrentLayout('home').catch(() => ({ versionId: null, layout: DEFAULT_LAYOUTS.home })),
+        getCachedLayoutHome().catch(() => ({ versionId: null, layout: DEFAULT_LAYOUTS.home })),
       ]);
       const posTheme = extractTheme(stat.client);
       const effectiveTheme = mergeTheme(posTheme, overrides);
