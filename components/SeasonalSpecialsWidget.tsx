@@ -53,7 +53,7 @@ export default function SeasonalSpecialsWidget({ coverImage, menuItems = [] }: S
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
               {/* Title & List */}
               <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-[#24333F]">
+                <h4 className="text-lg font-semibold">
                   Check out our{' '}
                   <span className="block text-2xl font-serif">Seasonal Offers</span>
                 </h4>

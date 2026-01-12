@@ -1,7 +1,7 @@
 // app/page.tsx
 'use client';
 
-import { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import NextImage from 'next/image';
 import dynamic from 'next/dynamic';
 
@@ -31,9 +31,19 @@ interface CategoryResponse {
   categories: Category[];
 }
 
+type LayoutSectionId = 'ticker' | 'story' | 'seasonal' | 'categories' | 'contact';
+type LayoutItem = { id: LayoutSectionId; enabled: boolean };
+type LayoutConfig = { items: LayoutItem[] };
+
 interface ClientResponse {
   primaryColor: string;
   secondaryColor: string;
+  headingPrimaryColor?: string;
+  headingSecondaryColor?: string;
+  bgColor?: string;
+  textColor?: string;
+  coverTextColor?: string;
+  backgroundColor?: string;
   bgImage: string;
   aboutUs: string;
   bookingAccess: boolean;
@@ -43,6 +53,7 @@ interface ClientResponse {
   openTimes: Record<string, string>;
   appDescription: string; // Optional field for app description
   logoImage: string; // Optional field for logo image
+  webDarkTheme?: boolean;
   kioskMessage?: string; // Optional field for kiosk message
   announceTitle?: string; // Optional field for announcement title
   littlesImages?: string[];
@@ -68,6 +79,40 @@ interface MenuItem {
 interface MenuResponse {
   menuItems: MenuItem[];
 }
+
+const DEFAULT_LAYOUT_ITEMS: LayoutItem[] = [
+  { id: 'ticker', enabled: true },
+  { id: 'story', enabled: true },
+  { id: 'seasonal', enabled: true },
+  { id: 'categories', enabled: true },
+  { id: 'contact', enabled: true },
+];
+
+const normalizeLayoutItems = (input: any, allowEmpty: boolean): LayoutItem[] => {
+  const rawItems = Array.isArray(input?.items) ? input.items : Array.isArray(input) ? input : [];
+  if (!rawItems.length) return allowEmpty ? [] : DEFAULT_LAYOUT_ITEMS;
+  const allowed = new Set<LayoutSectionId>(['ticker', 'story', 'seasonal', 'categories', 'contact']);
+  const seen = new Set<LayoutSectionId>();
+  const items: LayoutItem[] = [];
+  for (const raw of rawItems) {
+    const id = raw?.id as LayoutSectionId;
+    if (!id || !allowed.has(id)) continue;
+    if (seen.has(id)) continue;
+    items.push({ id, enabled: raw?.enabled !== false });
+    seen.add(id);
+  }
+  return items.length ? items : allowEmpty ? [] : DEFAULT_LAYOUT_ITEMS;
+};
+
+const normalizeHexColor = (value?: string) => {
+  if (!value) return '';
+  const raw = String(value).trim();
+  if (!raw) return '';
+  if (raw.startsWith('0x') && raw.length >= 8) return `#${raw.slice(-6)}`;
+  if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw;
+  if (/^[0-9a-fA-F]{6}$/.test(raw)) return `#${raw}`;
+  return '';
+};
 
 export default function HomePage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -117,9 +162,11 @@ export default function HomePage() {
   const [isBgReady, setIsBgReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState<string>('#d6112c');
   const [secondaryColor, setSecondaryColor] = useState('#9a731e');
-
-  // Logo Image
-  const [logoImage, setLogoImage] = useState<string>('/BalibuLogoLight.png');
+  const [headingPrimaryColor, setHeadingPrimaryColor] = useState('');
+  const [headingSecondaryColor, setHeadingSecondaryColor] = useState('');
+  const [brandText, setBrandText] = useState('');
+  const [coverTextColor, setCoverTextColor] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState('');
 
   // BG IMAGE
   const [bgImage, setBgImage] = useState<string>('');
@@ -135,6 +182,7 @@ export default function HomePage() {
 
   const [clientData, setClientData] = useState<ClientResponse | null>(null);
   const [menuData, setMenuData] = useState<MenuResponse | null>(null);
+  const [layoutItems, setLayoutItems] = useState<LayoutItem[]>(DEFAULT_LAYOUT_ITEMS);
 
 
   // category carousel state
@@ -150,6 +198,7 @@ export default function HomePage() {
           client: ClientResponse;
           menuItems: MenuItem[];
           categories: Category[];
+          layout?: LayoutConfig;
         };
 
         // Split and set
@@ -159,16 +208,48 @@ export default function HomePage() {
 
 
         // update colours and state from client data
-        setPrimaryColor('#' + clientJson.primaryColor.slice(-6));
-        setSecondaryColor('#' + clientJson.secondaryColor.slice(-6));
+        const primaryHex = normalizeHexColor(clientJson.primaryColor) || '#d6112c';
+        const secondaryHex = normalizeHexColor(clientJson.secondaryColor) || '#9a731e';
+        const headingPrimaryHex = normalizeHexColor(clientJson.headingPrimaryColor) || primaryHex;
+        const headingSecondaryHex = normalizeHexColor(clientJson.headingSecondaryColor) || secondaryHex;
+        const textHex = normalizeHexColor(clientJson.textColor);
+        const coverTextHex = normalizeHexColor(clientJson.coverTextColor);
+        const backgroundHex = normalizeHexColor(clientJson.backgroundColor || clientJson.bgColor);
+        const themeText = clientJson.webDarkTheme ? (secondaryHex || textHex) : textHex;
+
+        setPrimaryColor(primaryHex);
+        setSecondaryColor(secondaryHex);
+        setHeadingPrimaryColor(headingPrimaryHex);
+        setHeadingSecondaryColor(headingSecondaryHex);
+        setBrandText(themeText);
+        setCoverTextColor(coverTextHex);
+        setBackgroundColor(backgroundHex);
         setBgImage(clientJson.bgImage);
         setAboutUs(clientJson.aboutUs);
         setBookingAccess(clientJson.bookingAccess);
         setAppDescription(clientJson.appDescription || ''); // Set app description if available
-        setLogoImage(clientJson.logoImage); // Fallback to default logo if not provided
         setClientData(clientJson);
         setMenuData(menuJson);
         setCategoriesData(categoriesJson);
+        const hasLayout = typeof bootJson.layout !== 'undefined' && bootJson.layout !== null;
+        const nextLayout = normalizeLayoutItems(bootJson.layout, hasLayout);
+        const previewLayout = (() => {
+          if (typeof window === 'undefined') return null;
+          const params = new URLSearchParams(window.location.search);
+          const raw = params.get('layoutPreview');
+          if (!raw) return null;
+          try {
+            const decoded = decodeURIComponent(raw);
+            return normalizeLayoutItems(JSON.parse(decoded), true);
+          } catch {
+            try {
+              return normalizeLayoutItems(JSON.parse(raw), true);
+            } catch {
+              return null;
+            }
+          }
+        })();
+        setLayoutItems(previewLayout ?? nextLayout);
 
       } catch (err) {
         // handle error and keep fallback values
@@ -179,6 +260,25 @@ export default function HomePage() {
     }
     loadInitialData();
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (brandText) root.style.setProperty('--foreground', brandText);
+  }, [brandText]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const fallback = brandText || '#171717';
+    root.style.setProperty('--heading-primary', headingPrimaryColor || fallback);
+    root.style.setProperty('--heading-secondary', headingSecondaryColor || fallback);
+  }, [headingPrimaryColor, headingSecondaryColor, brandText]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--site-background', backgroundColor || '#FAF3EA');
+  }, [backgroundColor]);
+
+  const heroTextStyle = coverTextColor ? { color: coverTextColor } : undefined;
 
   // Choose a single ticker phrase (Staays-style)
   const tickerPhrase = useMemo(() => {
@@ -281,6 +381,76 @@ export default function HomePage() {
     return map;
   }, [topCategories]);
 
+  const sectionNodes = useMemo(() => {
+    const nodes: Record<LayoutSectionId, React.ReactNode> = {
+      ticker: <Ticker phrase={tickerPhrase} />,
+      story: (
+        <section
+          id="about"
+          className="bg-[var(--site-background)] py-16"
+        >
+          <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
+            <h2 className="text-4xl font-serif font-bold">
+              Our Story
+            </h2>
+            <div className="relative mx-auto w-full h-120 sm:h-72 md:h-120 rounded-2xl overflow-hidden shadow-md">
+              <NextImage
+                src="/OURSTORY_Pic.jpg"
+                alt="Our history"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+            <p className="text-lg leading-relaxed text-[#4A5058]">
+              {aboutUs}
+            </p>
+          </div>
+        </section>
+      ),
+      seasonal:
+        clientData && menuData && hasShowcase ? (
+          <SeasonalSpecialsWidget
+            coverImage={'/seasonalSpecials.JPG'}
+            menuItems={menuData?.menuItems}
+          />
+        ) : null,
+      categories:
+        clientData && topCategories.length > 0 ? (
+          <CategoryCarousel
+            heading="Explore by Category"
+            subheading="From IndoFusion bowls to sweet treats — browse by what you’re craving."
+            categories={topCategories}
+            imagesByCategory={imagesByCategory}
+            onAllClick={() => setActiveModal('order')}
+            primaryColor={primaryColor}
+            menuItems={menuData?.menuItems}
+          />
+        ) : null,
+      contact:
+        clientData ? (
+          <div id="contact" className="max-w-6xl mx-auto my-12 sm:my-16 px-4 space-y-6">
+            <ContactSection
+              address={clientData.address}
+              companyNumber={clientData.companyNumber}
+              openTimes={clientData.openTimes}
+            />
+          </div>
+        ) : null,
+    };
+
+    return nodes;
+  }, [
+    aboutUs,
+    clientData,
+    hasShowcase,
+    imagesByCategory,
+    menuData,
+    primaryColor,
+    tickerPhrase,
+    topCategories,
+  ]);
+
   // Preload bg image (more robust than relying on onLoadingComplete)
   useEffect(() => {
     setIsBgReady(false);
@@ -335,7 +505,7 @@ export default function HomePage() {
   // If page is still loading, show a skeleton
   if (isPageLoading) {
     return (
-      <main className="min-h-screen bg-[#FAF3EA]">
+      <main className="min-h-screen bg-[var(--site-background)]">
         <div className="animate-pulse max-w-6xl mx-auto px-4 py-12 space-y-6">
           {/* Skeleton for header */}
           <div className="h-12 bg-gray-300 rounded-md"></div>
@@ -353,7 +523,7 @@ export default function HomePage() {
 
   return (
     <>
-      <main className="min-h-screen bg-[#FAF3EA]">
+      <main className="min-h-screen bg-[var(--site-background)]">
 
         {/* ─── HEADER ───────────────────────────────────────────────────────── */}
         <header className="absolute inset-x-0 top-0 z-50">
@@ -404,7 +574,10 @@ export default function HomePage() {
           </div>
 
           {/* Content */}
-          <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 flex flex-col items-center text-white text-center gap-6">
+          <div
+            className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 flex flex-col items-center text-white text-center gap-6"
+            style={heroTextStyle}
+          >
             <div className="w-full max-w-2xl mx-auto space-y-6">
               <NextImage
                 src="/BalibuLogoLight.png"
@@ -478,66 +651,12 @@ export default function HomePage() {
           `}</style>
         </section>
 
-        {/* ─── SCROLLING BANNER ───────────────────────────────────────────────── */}
-        <Ticker phrase={tickerPhrase} />
-
-
-        {/* ─── OUR STORY ────────────────────────────────────────────────────── */}
-        <section
-          id="about"
-          className="bg-[#faf3ea] py-16" // soft, vibrant backdrop reminiscent of Staays’ Stories section
-        >
-          <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
-            <h2 className="text-4xl font-serif font-bold text-[#24333F]">
-              Our Story
-            </h2>
-            {/* Prominent image with rounded corners and shadow */}
-            <div className="relative mx-auto w-full h-120 sm:h-72 md:h-120 rounded-2xl overflow-hidden shadow-md">
-              <NextImage
-                src="/OURSTORY_Pic.jpg"
-                alt="Our history"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-            {/* Centered description */}
-            <p className="text-lg leading-relaxed text-[#4A5058]">
-              {aboutUs}
-            </p>
-          </div>
-        </section>
-
-        {/* ─── SEASONAL OFFERS ──────────────────────────────────────────────── */}
-
-        {clientData && menuData && hasShowcase && (
-          <SeasonalSpecialsWidget
-            coverImage={'/seasonalSpecials.JPG'}
-            menuItems={menuData?.menuItems}
-          />
-        )}
-
-        {clientData && topCategories.length > 0 && (
-          <CategoryCarousel
-            heading="Explore by Category"
-            subheading="From IndoFusion bowls to sweet treats — browse by what you’re craving."
-            categories={topCategories}
-            imagesByCategory={imagesByCategory}
-            onAllClick={() => setActiveModal('order')}
-            primaryColor={primaryColor}
-            menuItems={menuData?.menuItems}
-          />
-        )}
-
-        {clientData && (
-          <div id="contact" className="max-w-6xl mx-auto my-12 sm:my-16 px-4 space-y-6">
-            <ContactSection
-              address={clientData.address}
-              companyNumber={clientData.companyNumber}
-              openTimes={clientData.openTimes}
-            />
-          </div>
-        )}
+        {layoutItems.map((item) => {
+          if (!item.enabled) return null;
+          const node = sectionNodes[item.id];
+          if (!node) return null;
+          return <React.Fragment key={item.id}>{node}</React.Fragment>;
+        })}
 
       
         {/* ─── FOOTER ──────────────────────────────────────────────────────── */}
@@ -593,7 +712,7 @@ export default function HomePage() {
           >
             {/* Top bar */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b bg-[#F2EAE2]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-              <h2 className="text-base sm:text-lg font-semibold text-[#24333F]">Order Online</h2>
+              <h2 className="text-base sm:text-lg font-semibold">Order Online</h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={closeOrder}

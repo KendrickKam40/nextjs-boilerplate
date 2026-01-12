@@ -176,7 +176,7 @@ export default function LoyaltyDashboard() {
       <>
         <div id="recaptcha-container" />
         <div className="bg-white rounded-2xl p-4 space-y-4 max-w-xs border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Mobile Verification</h3>
+          <h3 className="text-lg font-semibold">Mobile Verification</h3>
           <p className="text-sm text-gray-600">
             Enter your mobile number below to receive a verification code. Once verified, you'll be able to view your loyalty points.
           </p>

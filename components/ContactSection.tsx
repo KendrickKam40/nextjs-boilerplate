@@ -24,9 +24,9 @@ export default function ContactSection({ address, companyNumber, openTimes = {} 
   }, [address]);
 
   return (
-  <section className="bg-[#FAF3EA] py-12 sm:py-16">
+  <section className="bg-[var(--site-background)] py-12 sm:py-16">
     <div className="max-w-6xl mx-auto px-4 space-y-8">
-      <h2 className="text-center text-3xl font-serif font-bold text-[#24333F]">
+      <h2 className="text-center text-3xl font-serif font-bold">
         Contact Us
       </h2>
       <p className="text-center italic text-[#4A5058]">
@@ -37,7 +37,7 @@ export default function ContactSection({ address, companyNumber, openTimes = {} 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Card 1: Store hours */}
         <div className="p-6 bg-white rounded-sm shadow-md border-t-4 border-[#d6112c]">
-          <h3 className="text-xl font-semibold text-[#24333F] mb-2">
+          <h3 className="text-xl font-semibold mb-2">
             Store Hours
           </h3>
           <div className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm">
@@ -61,11 +61,11 @@ export default function ContactSection({ address, companyNumber, openTimes = {} 
 
         {/* Card 2: Phone & address together */}
         <div className="p-6 bg-white rounded-sm shadow-md border-t-4 border-[#d6112c] space-y-4">
-          <h3 className="text-xl font-semibold text-[#24333F] mb-2">
+          <h3 className="text-xl font-semibold mb-2">
             Get in Touch
           </h3>
           <div>
-            <h4 className="text-lg font-semibold text-[#24333F]">Phone</h4>
+            <h4 className="text-lg font-semibold">Phone</h4>
             <a
               href={`tel:${companyNumber}`}
               className="text-lg font-bold text-[#d6112c] hover:underline"
@@ -74,7 +74,7 @@ export default function ContactSection({ address, companyNumber, openTimes = {} 
             </a>
           </div>
           <div>
-            <h4 className="text-lg font-semibold text-[#24333F]">Address</h4>
+            <h4 className="text-lg font-semibold">Address</h4>
             <p className="text-[#4A5058]">{address}</p>
           </div>
         </div>

@@ -1,6 +1,9 @@
 // app/api/client/route.ts
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
+import { extractTheme, mergeTheme, readThemeOverrides } from '@/lib/theme';
+import { DEFAULT_LAYOUTS } from '@/lib/layout-config';
+import { readCurrentLayout } from '@/lib/layout';
 
 /**
  * Strategy
@@ -15,6 +18,7 @@ interface CombinedOut {
   client: AnyObj;        // static client fields with certain dynamic flags overridden below
   menuItems: AnyObj[];   // dynamic, no-store
   categories: AnyObj[];  // static (cached)
+  layout: AnyObj;        // layout config
 }
 
 const UPSTREAM = process.env.MAXORDER_UPSTREAM!;
@@ -89,29 +93,43 @@ async function fetchDynamic(): Promise<{ clientFlags: Partial<AnyObj>; menuItems
 export async function GET() {
   try {
     // Fetch static (cached) + dynamic (fresh) in parallel
-    const [stat, dyn] = await Promise.all([
+    const [stat, dyn, overrides, layoutResult] = await Promise.all([
       getCachedStatic(),
       fetchDynamic(),
+      readThemeOverrides().catch(() => ({})),
+      readCurrentLayout('home').catch(() => ({ versionId: null, layout: DEFAULT_LAYOUTS.home })),
     ]);
 
     // Merge: static client + override volatile fields with dynamic snapshot
     const clientMerged = { ...stat.client, ...dyn.clientFlags };
+    const posTheme = extractTheme(clientMerged);
+    const effectiveTheme = mergeTheme(posTheme, overrides);
+    const clientWithTheme = { ...clientMerged, ...effectiveTheme };
 
     const payload: CombinedOut = {
-      client: clientMerged,
+      client: clientWithTheme,
       categories: stat.categories,
       menuItems: dyn.menuItems,
+      layout: layoutResult.layout,
     };
 
     return NextResponse.json(payload);
   } catch (err: any) {
     // If dynamic fails, fall back to static so the site still renders, but with empty menu
     try {
-      const stat = await getCachedStatic();
+      const [stat, overrides, layoutResult] = await Promise.all([
+        getCachedStatic(),
+        readThemeOverrides().catch(() => ({})),
+        readCurrentLayout('home').catch(() => ({ versionId: null, layout: DEFAULT_LAYOUTS.home })),
+      ]);
+      const posTheme = extractTheme(stat.client);
+      const effectiveTheme = mergeTheme(posTheme, overrides);
+      const clientWithTheme = { ...stat.client, ...effectiveTheme };
       const payload: CombinedOut = {
-        client: stat.client, // may contain stale flags
+        client: clientWithTheme, // may contain stale flags
         categories: stat.categories,
         menuItems: [],
+        layout: layoutResult.layout,
       };
       return NextResponse.json(payload, { status: 200, statusText: 'OK (dynamic fallback)' });
     } catch (e: any) {

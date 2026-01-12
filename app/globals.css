@@ -5,6 +5,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --heading-primary: var(--foreground);
+  --heading-secondary: var(--foreground);
+  --site-background: #FAF3EA;
   --font-serif: 'Oswald', sans-serif;
   --font-sans: 'Montserrat', sans-serif;
 }
@@ -38,16 +41,13 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--foreground);
+  color: var(--heading-secondary, var(--foreground));
 }
 
-h1.banner{
-  color: #ffffff;
+h1, h2 {
+  color: var(--heading-primary, var(--foreground));
 }
 
-h3.category-white {
-  color: #ffffff;
-}
 
 /* Ensure other text elements use your sans-serif body font */
 p, a, span, li {

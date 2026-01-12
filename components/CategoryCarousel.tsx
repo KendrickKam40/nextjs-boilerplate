@@ -83,7 +83,7 @@ function MenuModal({
         <div className="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl bg-white shadow-xl">
           {/* Header */}
           <div className="sticky-header flex items-center justify-between px-6 py-4 border-b">
-            <h3 className="text-2xl font-serif font-bold text-[#24333F] truncate">
+            <h3 className="text-2xl font-serif font-bold truncate">
               {categoryName}
             </h3>
             <button
@@ -107,7 +107,7 @@ function MenuModal({
                     <div className="flex items-start gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-3">
-                          <h4 className="text-lg font-semibold text-[#24333F]">
+                          <h4 className="text-lg font-semibold">
                             {it.shortName || it.name}
                           </h4>
                           {it.soldOut === 0 && (
@@ -239,10 +239,6 @@ export default function CategoryCarousel({
   const candidatePng = `/images/categories/balinese/${slug}.png`;
   if (AVAILABLE_BALI_SLUGS.has(slug) && imgValid[candidatePng] === true) return candidatePng;
 
-    // Try jpg as a secondary fallback
-  const candidateJpg = `/images/categories/balinese/${slug}.jpg`;
-  if (AVAILABLE_BALI_SLUGS.has(slug) && imgValid[candidateJpg] === true) return candidateJpg;
-
     // Final fallback: deterministic pick from provided pool (if any)
     if (images && images.length > 0) {
       const idx = hashCode(name) % images.length;
@@ -313,10 +309,8 @@ export default function CategoryCarousel({
       }
       const slug = slugify(name);
       const png = `/images/categories/balinese/${slug}.png`;
-      const jpg = `/images/categories/balinese/${slug}.jpg`;
       if (AVAILABLE_BALI_SLUGS.has(slug)) {
         if (!imgValid[png] && !imgFailures[png]) candidates.push(png);
-        if (!imgValid[jpg] && !imgFailures[jpg]) candidates.push(jpg);
       }
       if (images && images.length > 0) {
         const pooled = images[hashCode(name) % images.length];
@@ -377,7 +371,7 @@ export default function CategoryCarousel({
         {/* Left copy column */}
         <div className="lg:col-span-1 space-y-4">
           <p className="text-xs tracking-[0.2em] uppercase text-[#4A5058]">Our Menu</p>
-          <h2 className="text-4xl font-serif font-bold text-[#24333F]">{heading}</h2>
+          <h2 className="text-4xl font-serif font-bold">{heading}</h2>
           <p className="text-[#4A5058]">{subheading}</p>
           <div>
             <Button
@@ -412,7 +406,7 @@ export default function CategoryCarousel({
                   className="card relative snap-start shrink-0 rounded-2xl overflow-hidden bg-[#f1e7da] shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label={cat.name}
                 >
-                  {/* Image priority: explicit map -> /images/categories/balinese/<slug>.{png|jpg} -> pooled -> initials */}
+                  {/* Image priority: explicit map -> /images/categories/balinese/<slug>.png -> pooled -> initials */}
                   {img ? (
                     <NextImage
                       src={img}
@@ -437,7 +431,7 @@ export default function CategoryCarousel({
                   {/* label */}
                   <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white p-4">
                     <p className="text-xs tracking-[0.2em] uppercase opacity-80">Category</p>
-                    <h3 className="text-xl font-serif font-bold category-white">{cat.name}</h3>
+                    <h3 className="text-xl font-serif font-bold">{cat.name}</h3>
                   </div>
                 </article>
               );

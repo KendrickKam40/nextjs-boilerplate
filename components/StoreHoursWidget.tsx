@@ -120,7 +120,7 @@ export default function StoreHoursWidget({ compact = false, data: dataProp = nul
     <div className="bg-[#F2EAE2] p-6 rounded-2xl w-full border border-[#EAE0DA]">
       <div className="flex items-center space-x-2 mb-2">
         <Clock className="h-5 w-5 text-[#d6112c]" />
-        <h4 className="text-lg font-semibold text-[#24333F]">Store Hours</h4>
+        <h4 className="text-lg font-semibold">Store Hours</h4>
       </div>
       <div className="flex items-center justify-between">
         <span className={isOpen ? 'text-[#22C55E] font-bold' : 'text-[#EF4444] font-bold'}>

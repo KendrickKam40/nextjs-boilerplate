@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#f7f7f7] px-4">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 space-y-4 border border-gray-100">
         <header className="space-y-1">
-          <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
+          <h1 className="text-2xl font-bold">Admin Login</h1>
           <p className="text-sm text-gray-600">Enter the admin password to continue.</p>
         </header>
 
