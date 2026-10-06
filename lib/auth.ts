@@ -39,7 +39,7 @@ function sign(payload: SessionPayload) {
 }
 
 function verify(token: string): SessionPayload | null {
-  requireSecrets();
+  if (!ADMIN_SECRET) return null;
   const parts = token.split('.');
   if (parts.length !== 3) return null;
   const [headerB64, bodyB64, sigB64] = parts;
@@ -47,12 +47,15 @@ function verify(token: string): SessionPayload | null {
   const expected = base64url(
     crypto.createHmac('sha256', ADMIN_SECRET).update(data).digest()
   );
-  if (!crypto.timingSafeEqual(Buffer.from(sigB64), Buffer.from(expected))) return null;
+  const suppliedSignature = Buffer.from(sigB64);
+  const expectedSignature = Buffer.from(expected);
+  if (suppliedSignature.length !== expectedSignature.length) return null;
+  if (!crypto.timingSafeEqual(suppliedSignature, expectedSignature)) return null;
 
   try {
     const payload = JSON.parse(Buffer.from(bodyB64, 'base64').toString('utf8')) as SessionPayload;
     if (payload.sub !== 'admin') return null;
-    if (typeof payload.exp !== 'number' || Date.now() / 1000 > payload.exp) return null;
+    if (typeof payload.exp !== 'number' || !Number.isFinite(payload.exp) || Date.now() / 1000 >= payload.exp) return null;
     if (typeof payload.jti !== 'string') return null;
     return payload;
   } catch {

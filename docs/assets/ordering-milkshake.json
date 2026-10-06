@@ -1,0 +1,24 @@
+{
+  "generator": "Built-in image_gen tool",
+  "date": "2026-10-02",
+  "file": "public/images/brand/floating-ordering-milkshake.png",
+  "reference": "docs/assets/ordering-references/milkshake.jpg",
+  "referenceRole": "Only image input: actual Balibu Milkshake photograph from its public Uber Eats ordering menu. The fully visible pink cup is selected.",
+  "sourcePage": "https://www.ubereats.com/nz/store/balibu/ruAgSzoUUAG1f7EOj4s-BQ",
+  "sourceImage": "https://tb-static.uber.com/prod/image-proc/processed_images/e27dcad7482895c2caedf1fb4cd9c0e3/d03e52b3c8af19d8fa8222e23efd9cfa.jpeg",
+  "generatedSource": "/Users/kendrickkam/.codex/generated_images/01a0f5d7-7927-7a62-b702-b8a7eae7b293/exec-a00346b5-8c5d-4aad-b072-fbee0b38ac1a.png",
+  "usage": "Generated adaptation of ordering imagery, not an unedited photograph or a new menu promise. No prior website imagery was supplied to the generator. Original output copied unchanged with alpha.",
+  "prompt": "Use case: background-extraction. Asset type: transparent photographic food cutout for the Balibu restaurant website. Input 1 is the ONLY reference: Balibu's actual online ordering image for Milkshake, showing four branded takeaway cups. Recreate and isolate ONLY the fully visible PINK milkshake, the third cup from the left, as one faithful high-resolution product cutout. Preserve that product's recognizable straight tapering clear plastic takeaway cup, realistic generous serving proportions, opaque pale pink milkshake with vivid strawberry-red syrup streaks down its inner walls, the same clear domed plastic lid enclosing its modest white cream topping and small coloured topping pieces that are visible in the reference, and its actual black brush-circle BALIBU logo with red i. Match the reference presentation and branding closely; do not redesign the container or garnish. Keep the cup standing vertically upright, camera slightly above rim height as in the reference so the lid has depth. Entire cup, domed lid and base visible, one centered cup occupies 78 percent of a square canvas height. Natural believable product-photo lighting from upper left, neutral whites, crisp appetising detail, realistic plastic reflections. Improve clarity without changing what is served. Background genuinely transparent alpha including outside and around the lid; preserve translucent plastic edges. No floor, no brick wall, no leaves, no other cups, no invented fruit or straw, no extra toppings, no ceramic tableware, no text outside the existing cup logo, no cast shadow outside the cutout. This is a generated adaptation of the actual ordering photograph, not an invented new menu item.",
+  "output": {
+    "width": 1254,
+    "height": 1254,
+    "format": "PNG",
+    "mode": "RGBA",
+    "bytes": 1352595,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "unchangedCopyOfGeneratedOutput": true
+  }
+}

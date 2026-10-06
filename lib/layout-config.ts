@@ -1,4 +1,7 @@
 export const PAGE_KEYS = ['home'] as const;
+
+/** Cache tag for the published homepage layout (see app/api/client/route.ts). */
+export const SITE_LAYOUT_TAG = 'site-layout';
 export type PageKey = (typeof PAGE_KEYS)[number];
 
 export type LayoutSectionId =
@@ -23,15 +26,38 @@ export type LayoutSection = {
   description: string;
 };
 
+// Labels match the homepage card titles staff see on the website (lib/site-navigation.ts).
 export const LAYOUT_SECTIONS: Record<PageKey, LayoutSection[]> = {
   home: [
-    { id: 'ticker', label: 'Ticker', description: 'Scrolling announcement banner.' },
-    { id: 'story', label: 'Our Story', description: 'Brand story with image.' },
-    { id: 'seasonal', label: 'Seasonal Offers', description: 'Showcase specials section.' },
-    { id: 'categories', label: 'Categories', description: 'Category carousel.' },
-    { id: 'contact', label: 'Contact', description: 'Contact details and map.' },
+    {
+      id: 'ticker',
+      label: 'Announcement',
+      description: 'Shows the kiosk message from the POS in a strip at the top of the homepage.',
+    },
+    {
+      id: 'categories',
+      label: 'The menu',
+      description: 'Menu sections, with live items and prices from the POS.',
+    },
+    {
+      id: 'story',
+      label: 'About Balibu',
+      description: 'Balibu’s story with a food photo.',
+    },
+    {
+      id: 'seasonal',
+      label: 'Featured dishes',
+      description: 'Smoky, spicy and sweet dishes, plus POS items marked as showcase.',
+    },
+    {
+      id: 'contact',
+      label: 'Visit us',
+      description: 'Address, opening hours, directions and the counter photo.',
+    },
   ],
 };
+
+export const ANNOUNCEMENT_SECTION: LayoutSectionId = 'ticker';
 
 export const DEFAULT_LAYOUTS: Record<PageKey, LayoutConfig> = {
   home: {

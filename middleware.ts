@@ -1,4 +1,3 @@
-// middleware.ts (project root: same level as /app or /pages)
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -7,7 +6,9 @@ import type { NextRequest } from 'next/server';
  * Prefer a non-public var for server-only (middleware runs on the edge runtime).
  */
 const COMING_SOON_ENABLED = process.env.COMING_SOON === 'true';
-const DISPLAY_PATH = `/${process.env.DISPLAY_PATH || 'store-display'}`;
+// /store-display always works; DISPLAY_PATH adds an alias for it (e.g. a less guessable path).
+const STORE_DISPLAY = '/store-display';
+const DISPLAY_ALIAS = process.env.DISPLAY_PATH ? `/${process.env.DISPLAY_PATH.replace(/^\/+/, '')}` : STORE_DISPLAY;
 const ADMIN_COOKIE = 'admin_session';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 
@@ -38,25 +39,26 @@ async function verifyAdminToken(token: string | undefined | null) {
   const parts = token.split('.');
   if (parts.length !== 3) return false;
   const [headerB64, payloadB64, sigB64] = parts;
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    enc.encode(ADMIN_SECRET),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify']
-  );
-  const data = enc.encode(`${headerB64}.${payloadB64}`);
-  const sig = base64UrlToUint8Array(sigB64);
-  const ok = await crypto.subtle.verify('HMAC', key, sig, data);
-  if (!ok) return false;
-
   try {
-    const json = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      enc.encode(ADMIN_SECRET),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+    const data = enc.encode(`${headerB64}.${payloadB64}`);
+    const sig = base64UrlToUint8Array(sigB64);
+    const ok = await crypto.subtle.verify('HMAC', key, sig, data);
+    if (!ok) return false;
+
+    const json = JSON.parse(new TextDecoder().decode(base64UrlToUint8Array(payloadB64)));
     const exp = json?.exp;
     const sub = json?.sub;
     if (sub !== 'admin') return false;
-    if (typeof exp !== 'number' || exp < Date.now() / 1000) return false;
+    if (typeof exp !== 'number' || !Number.isFinite(exp) || exp <= Date.now() / 1000) return false;
+    if (typeof json.jti !== 'string') return false;
     return true;
   } catch {
     return false;
@@ -66,15 +68,15 @@ async function verifyAdminToken(token: string | undefined | null) {
 export async function middleware(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
-  // Protect admin pages and APIs with presence of session cookie (allow login endpoints)
-  const isAdminArea = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
+  // Validate the session for both admin pages and API routes.
+  const isAdminArea = pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/api/admin' || pathname.startsWith('/api/admin/');
   const isLoginPath = pathname === '/admin/login' || pathname === '/api/admin/login';
   if (isAdminArea && !isLoginPath) {
     const token = req.cookies.get(ADMIN_COOKIE)?.value;
     const isValid = await verifyAdminToken(token);
     if (!isValid) {
       if (pathname.startsWith('/api')) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        return NextResponse.json({ error: 'You’ve been signed out. Sign in again to save.' }, { status: 401 });
       }
       const url = req.nextUrl.clone();
       url.pathname = '/admin/login';
@@ -85,6 +87,12 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (DISPLAY_ALIAS !== STORE_DISPLAY && pathname === DISPLAY_ALIAS) {
+    const url = req.nextUrl.clone();
+    url.pathname = STORE_DISPLAY;
+    return NextResponse.rewrite(url);
+  }
+
   if (!COMING_SOON_ENABLED) return NextResponse.next();
 
   // 1) Always let core/internal and explicit allowlist paths through
@@ -92,7 +100,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/coming-soon') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
-    pathname === DISPLAY_PATH ||
+    pathname === STORE_DISPLAY ||
     pathname.startsWith('/admin') ||
     PUBLIC_FILE.test(pathname)
   ) {
@@ -124,18 +132,9 @@ export async function middleware(req: NextRequest) {
   return NextResponse.rewrite(url);
 }
 
-/**
- * Run on (almost) everything, but skip /api, /_next and public root files.
- * This avoids touching static assets and Next internals.
- *
- * The negative lookahead keeps important internals and root files out.
- */
+// Include admin APIs; exclude only Next internals and public assets.
 export const config = {
   matcher: [
-    // Match all paths except:
-    //  - /api
-    //  - /_next
-    //  - root files like /favicon.ico, /robots.txt, etc.
-    '/((?!api|_next|[\\w-]+\\.\\w+).*)',
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)',
   ],
 };

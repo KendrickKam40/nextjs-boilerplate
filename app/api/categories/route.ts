@@ -1,6 +1,7 @@
 // app/api/categories/route.ts
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
+import { fetchMaxorder } from '../_lib/maxorder';
 
 type Category = {
   name: string;
@@ -13,25 +14,13 @@ type Category = {
 
 type CategoriesResponse = { categories: Category[] };
 
-// You can override the endpoint via env if needed.
-const CATEGORIES_ENDPOINT =
-  process.env.MAXORDER_CATEGORIES_URL ||
-  'https://australia-southeast1-maxordering.cloudfunctions.net/thirdpartyaccess/getClientAndMenu';
-
 async function fetchCategories(): Promise<CategoriesResponse> {
-  const res = await fetch(CATEGORIES_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.MAXORDER_API_KEY!,
-    },
-    body: JSON.stringify({ clientId: process.env.MAXORDER_CLIENT_ID! }),
-  });
-  if (!res.ok) {
-    throw new Error(`Categories upstream error ${res.status}`);
+  const data = await fetchMaxorder({ endpoint: process.env.MAXORDER_CATEGORIES_URL });
+  const categories = data.categories ?? data.menu?.categories;
+  if (!Array.isArray(categories)) {
+    throw new Error('Invalid payload: categories missing');
   }
-  // Expecting { categories: [...] }
-  return res.json();
+  return { categories };
 }
 
 // Cache for 10 minutes
@@ -45,7 +34,10 @@ export async function GET() {
   try {
     const data = await getCachedCategories();
     return NextResponse.json(data);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { categories: [], error: 'Menu categories are temporarily unavailable.' },
+      { status: 503 }
+    );
   }
 }
