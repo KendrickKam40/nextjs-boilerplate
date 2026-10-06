@@ -1,0 +1,47 @@
+{
+  "asset": "public/images/brand/floating-ordering-sundae.png",
+  "generatedAt": "2026-10-02",
+  "mode": "built-in image_gen",
+  "skill": "/Users/kendrickkam/.codex/skills/.system/imagegen/SKILL.md",
+  "useCase": "background-extraction",
+  "userDirection": "Use actual online-ordering product photographs as the base; do not use existing repository images as references.",
+  "productName": "Fully Loaded Sundae",
+  "reference": {
+    "pageUrl": "https://www.ubereats.com/nz/store/balibu/ruAgSzoUUAG1f7EOj4s-BQ",
+    "imageUrl": "https://tb-static.uber.com/prod/image-proc/processed_images/1ef2a22431f6d72f90da0cb27e936120/a1681d67ebe55c76c3af5f401619c278.jpeg",
+    "localPath": "docs/assets/ordering-references/fully-loaded-sundae.jpg",
+    "width": 550,
+    "height": 440,
+    "description": "Photograph published on Balibu's Uber Eats merchant listing: clear branded cup containing vanilla soft serve with chocolate sauce, colourful sprinkles and candies, a whole sandwich cookie and a golden biscuit.",
+    "sourceEvidence": "/tmp/balibu-ordering-references/desserts-browser.json",
+    "referenceRole": "Only product and visual reference used for generation."
+  },
+  "prompt": "Use case: background-extraction\nAsset type: transparent website food cutout for Balibu.\nInput image: the single attached image is the ACTUAL Fully Loaded Sundae photograph from Balibu's online ordering listing. It is the only product and style reference. Faithfully isolate and photographically clarify THIS exact serving.\nPrimary request: retain the original tall clear plastic cup, its tapered cylindrical shape and round rim, vanilla soft-serve with chocolate sauce layered down the cup, the visible Balibu printed mark, the tall vanilla swirl, colourful sprinkles and small candy pieces, whole dark round sandwich cookie behind the swirl, and long golden biscuit angled up at the left. Preserve the photographed quantity, arrangement, colour, proportions and slightly elevated front viewing angle. Keep every part of the cup and toppings in frame.\nComposition: square canvas, entire dessert centred upright and occupying approximately 75 percent of image height, comfortable clear space around it. Natural photorealistic food texture and appetising clarity, modest warm light from the upper left, crisp readable silhouette.\nScene/backdrop: remove the grey tabletop and all surrounding background completely; output genuine alpha transparency, including around the cup's thin clear plastic edges, without a new surface or cast floor shadow. Keep the real food and cup naturally opaque and translucent where appropriate.\nConstraints: change only background isolation, image clarity, and subtle lighting polish. Do not redesign the serving, swap the vessel, turn it into a cone, remove existing toppings, add fruit/coconut/other ingredients, add utensils, hands, people, decorative objects, captions, extra logos, or watermarks. No illustration, no invented replacement packaging, no white/grey/checkerboard background painted into the image. Preserve the existing cup's printed brand mark as photographed.",
+  "toolArguments": {
+    "transparent_background": true,
+    "referenced_image_paths": [
+      "/tmp/balibu-ordering-references/fully-loaded-sundae.jpg"
+    ]
+  },
+  "generatedSourcePath": "/Users/kendrickkam/.codex/generated_images/01a0fa27-0a06-78d1-a131-3e66df8eb92e/exec-a9c3dc14-94bf-424e-a161-28283a87346e.png",
+  "output": {
+    "width": 1254,
+    "height": 1254,
+    "format": "PNG",
+    "mode": "RGBA",
+    "bytes": 1378737,
+    "sha256": "d0cc03cdcb843f67d44914318737f9f3407b454d30d0b4cb361c831f6b55403e",
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "transparentPixelCount": 973049,
+    "translucentPixelCount": 599275,
+    "opaquePixelCount": 192,
+    "unchangedCopyOfGeneratedOutput": true
+  },
+  "inspection": "Visually inspected reference and output. Preserves the clear tapered cup, cream-and-chocolate layers, branded mark, vanilla swirl, colourful toppings, sandwich cookie and angled biscuit. The grey tabletop is removed and genuine alpha is present. This is an AI-enhanced cutout based on the merchant photo, not an unchanged documentary photograph.",
+  "rejectedApproach": "No generation was started from the repository illustration or existing soft-serve image; those references were discarded after the user's correction.",
+  "productionCodeChanges": true,
+  "usage": "Shared by hero, menu dessert collection and Featured Sweet panel. Generated adaptation of ordering photography; source output and alpha copied unchanged."
+}

@@ -1,7 +1,7 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { getAdminCookieName, verifySessionToken } from '@/lib/auth';
-import { DEFAULT_LAYOUTS, isPageKey } from '@/lib/layout-config';
+import { revalidateTag } from 'next/cache';
+import { requireAdmin } from '@/lib/admin-guard';
+import { ANNOUNCEMENT_SECTION, DEFAULT_LAYOUTS, SITE_LAYOUT_TAG, isPageKey, normalizeLayout } from '@/lib/layout-config';
 import { listLayoutHistory, readCurrentLayout, restoreLayoutVersion, saveLayoutVersion } from '@/lib/layout';
 
 function getPageKey(req: Request) {
@@ -11,15 +11,6 @@ function getPageKey(req: Request) {
   return value;
 }
 
-async function requireAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(getAdminCookieName())?.value;
-  const payload = verifySessionToken(token);
-  if (!payload) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  return null;
-}
 
 export async function GET(req: Request) {
   const authErr = await requireAdmin();
@@ -41,8 +32,9 @@ export async function GET(req: Request) {
       current,
       history,
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message ?? 'Internal Error' }, { status: 500 });
+  } catch (error) {
+    console.error('[admin/layout] read failed', error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: 'The homepage layout can’t be loaded right now. Try again in a minute.' }, { status: 503 });
   }
 }
 
@@ -59,22 +51,35 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    return NextResponse.json({ error: 'Something went wrong sending the layout. Try saving again.' }, { status: 400 });
   }
 
-  if (body?.action === 'restore') {
-    const versionId = String(body?.versionId || '');
-    if (!versionId) {
-      return NextResponse.json({ error: 'versionId is required' }, { status: 422 });
+  try {
+    if (body?.action === 'restore') {
+      const versionId = String(body?.versionId || '');
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(versionId)) {
+        return NextResponse.json({ error: 'That saved version couldn’t be found. Refresh the page and try again.' }, { status: 422 });
+      }
+      const restored = await restoreLayoutVersion(pageKey, versionId);
+      if (!restored) {
+        return NextResponse.json({ error: 'That saved version couldn’t be found. Refresh the page and try again.' }, { status: 404 });
+      }
+      revalidateTag(SITE_LAYOUT_TAG);
+      return NextResponse.json({ ok: true, current: restored });
     }
-    const restored = await restoreLayoutVersion(pageKey, versionId);
-    if (!restored) {
-      return NextResponse.json({ error: 'Version not found' }, { status: 404 });
-    }
-    return NextResponse.json({ ok: true, current: restored });
-  }
 
-  const layoutInput = body?.layout ?? body ?? {};
-  const saved = await saveLayoutVersion(pageKey, layoutInput, 'admin');
-  return NextResponse.json({ ok: true, current: saved });
+    const layoutInput = body?.layout ?? body ?? {};
+    const chapters = normalizeLayout(layoutInput, pageKey).items.filter(
+      (item) => item.id !== ANNOUNCEMENT_SECTION && item.enabled,
+    );
+    if (chapters.length === 0) {
+      return NextResponse.json({ error: 'Show at least one homepage section. Otherwise the homepage is just the headline.' }, { status: 422 });
+    }
+    const saved = await saveLayoutVersion(pageKey, layoutInput, 'admin');
+    revalidateTag(SITE_LAYOUT_TAG);
+    return NextResponse.json({ ok: true, current: saved });
+  } catch (error) {
+    console.error('[admin/layout] write failed', error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: 'The layout wasn’t saved. Try again in a minute.' }, { status: 503 });
+  }
 }

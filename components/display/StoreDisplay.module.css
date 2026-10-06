@@ -1,0 +1,123 @@
+/* Unattended counter screen: read from ~3 m, never touched, runs all day. */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  background: #000;
+  cursor: none;
+  user-select: none;
+}
+.video {
+  position: relative;
+  min-height: 0;
+  background: #000;
+}
+.video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  /* Hovering never brings up YouTube's title bar or links. */
+  pointer-events: none;
+}
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  /* 5% keeps text clear of TV overscan. */
+  padding: 5vh 5vw;
+  background: var(--b-ink);
+  color: var(--b-on-ink);
+}
+.portraitBrand {
+  display: none;
+}
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.4vmin;
+  max-width: 80vw;
+  text-align: center;
+}
+.fallback .brand,
+.portraitBrand .brand {
+  /* Slow drift so no fixed image burns into the panel. */
+  animation: drift 1200s ease-in-out infinite alternate;
+}
+.logo {
+  width: clamp(120px, 18vmin, 420px);
+  padding: 1.4vmin;
+  border-radius: 50%;
+  background: var(--b-paper);
+}
+.brand .headline {
+  margin: 0;
+  font-weight: 400;
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: clamp(48px, 9vmin, 260px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--b-on-ink);
+}
+.headline em {
+  display: inline-block;
+  font-family: var(--font-script), cursive;
+  font-style: normal;
+  font-size: 1.12em;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  color: var(--b-gold);
+}
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6em 1.4em;
+  margin: 0;
+  font-size: clamp(24px, 3.6vmin, 96px);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.details span {
+  color: var(--b-on-ink-muted);
+}
+.hint {
+  max-width: 48ch;
+  margin: 2vmin 0 0;
+  padding-top: 2vmin;
+  border-top: 1px solid color-mix(in srgb, var(--b-on-ink) 22%, transparent);
+  color: var(--b-on-ink-muted);
+  font-size: clamp(16px, 2.1vmin, 52px);
+  line-height: 1.4;
+}
+
+/* Portrait-mounted screens: video on top, brand panel fills the rest. */
+@media (orientation: portrait) {
+  .screen {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .video {
+    aspect-ratio: 16 / 9;
+  }
+  .portraitBrand {
+    display: grid;
+    place-items: center;
+    padding: 4vh 5vw 5vh;
+    background: var(--b-ink);
+    color: var(--b-on-ink);
+  }
+}
+
+@keyframes drift {
+  0% { transform: translate(-2vmin, -1.5vmin); }
+  50% { transform: translate(2vmin, 1vmin); }
+  100% { transform: translate(-1vmin, 2vmin); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fallback .brand,
+  .portraitBrand .brand { animation: none; }
+}

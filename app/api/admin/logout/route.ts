@@ -6,7 +6,7 @@ export async function POST() {
   const cookieStore = await cookies();
   cookieStore.set(getAdminCookieName(), '', {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
     maxAge: 0,

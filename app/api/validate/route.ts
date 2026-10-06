@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { email } = body
+  const email = body?.email
 
   // 2) Basic email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

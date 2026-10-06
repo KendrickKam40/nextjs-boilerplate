@@ -1,0 +1,16 @@
+Asset: public/images/brand/indonesian-feast.png
+Generator: built-in image_gen tool
+Purpose: atmospheric food image replacing the Our Story illustration; generated imagery, not a photograph of Balibu's actual plated menu.
+
+Final prompt
+
+Use case: photorealistic-natural.
+Asset type: an editorial food photograph for the Our Story section of Balibu, an Indonesian restaurant website with a warm cream, charcoal and chilli-red design.
+Primary request: create an exceptionally appetising, believable Indonesian sharing feast photographed by an accomplished food photographer. Food is the unmistakable hero, richly textured and inviting.
+Scene/backdrop: a dark, tactile timber dining table; a quiet, softly blurred background without identifiable venue features.
+Subject: in the foreground a beautiful dark handmade ceramic plate of nasi goreng with distinct golden rice grains, a crisp-edged sunny-side-up egg with glossy golden yolk, sliced cucumber and small fresh garnishes. Just behind and beside it, a banana-leaf-lined plate of deeply caramelised chicken satay skewers with a small bowl of textured peanut sauce; a small dark dish of vivid red sambal, a halved lime, a few red chillies and natural coriander leaves. A coherent meal to share, casually arranged with believable portion sizes and imperfect handmade details.
+Style/medium: premium natural restaurant food photography, real appetising textures, subtle film grain, restrained editorial colour grade. No illustration, no stylised painting, no plastic-looking AI food.
+Composition/framing: landscape 3:2 composition viewed from a close three-quarter overhead angle, approximately 45 degrees, with appetising dimension and moderate depth of field. Keep the main rice plate, egg and satay within the central 75 percent so the photo also crops well to a nearly square mobile card. The spread fills the frame generously but leaves modest dark table breathing room near the outer edges. Sharp focus across the main dishes; background gently softer.
+Lighting/mood: warm directional daylight from the side, soft natural shadows, rich but readable charcoal tones, golden highlights on the food. Cosy, generous, grounded and delicious. Realistic whites on the egg, greens stay fresh; no heavy orange wash.
+Constraints: no text, no lettering, no brand logo, no watermark, no people or hands, no cartoon, no border, no collage. This is atmospheric food imagery, not a fabricated photograph of a specific restaurant interior.
+

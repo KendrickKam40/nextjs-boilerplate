@@ -1,0 +1,31 @@
+/* Admin tokens: a quiet working surface; Balibu's olive marks primary actions. */
+.admin-root {
+  --a-canvas: #f4f4f1;
+  --a-surface: #ffffff;
+  --a-sunken: #f7f7f4;
+  --a-ink: #1d211c;
+  --a-muted: #5a6157;
+  --a-line: #d9dcd4;
+  /* Form field edges need 3:1 against the surface (WCAG 1.4.11). */
+  --a-field: #858b81;
+  --a-primary: #263829;
+  --a-primary-hover: #3d5039;
+  --a-on-primary: #ffffff;
+  --a-danger: #a3271a;
+  --a-on-danger: #ffffff;
+  --a-danger-soft: #fbecea;
+  --a-success: #2f6b3a;
+  --a-success-soft: #e8f3ea;
+  --a-warning: #8a5a00;
+  --a-warning-soft: #fdf3dc;
+  min-height: 100svh;
+  background: var(--a-canvas);
+  color: var(--a-ink);
+}
+.admin-root :focus-visible {
+  outline: 2px solid var(--a-primary);
+  outline-offset: 2px;
+}
+.admin-root dialog::backdrop {
+  background: rgb(20 22 19 / 55%);
+}

@@ -1,33 +1,38 @@
 // app/api/points/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
+import type { Auth } from 'firebase-admin/auth';
 // import { getUserPoints } from '@/lib/db';  // your DB‐lookup helper
 
-// Initialize Firebase Admin if not already initted
-if (!getApps().length) {
-  initializeApp({
-    credential: cert(
-      // Make sure FIREBASE_SERVICE_ACCOUNT contains the JSON string of your service account
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!)
-    ),
-    
-  });
+// Initialize on demand so builds and public pages do not require credentials.
+async function getLoyaltyAuth(): Promise<Auth> {
+  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!serviceAccount) throw new Error('Loyalty is not configured');
+  const [{ initializeApp, getApps, cert }, { getAuth }] = await Promise.all([
+    import('firebase-admin/app'),
+    import('firebase-admin/auth'),
+  ]);
+  if (!getApps().length) {
+    initializeApp({ credential: cert(JSON.parse(serviceAccount)) });
+  }
+  return getAuth();
 }
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization') || '';
-  const idToken = authHeader.split(' ')[1];
+  const idToken = /^Bearer\s+(\S+)$/i.exec(authHeader)?.[1];
   if (!idToken) {
     return NextResponse.json({ error: 'Missing token' }, { status: 401 });
   }
 
+  let auth: Auth;
   try {
-    console.log('Verifying token', idToken);
-    const decoded = await getAuth().verifyIdToken(idToken);
-    const uid = decoded.uid;
+    auth = await getLoyaltyAuth();
+  } catch {
+    return NextResponse.json({ error: 'Loyalty is temporarily unavailable' }, { status: 503 });
+  }
 
-    console.log('Decoded token', decoded);
+  try {
+    await auth.verifyIdToken(idToken);
 
     // lookup actual point using Firebase API
     // https://firestore.googleapis.com/v1/$docPath/projects/$projectId/databases/(default)/documents/Clients/$companyId/Loyalty/$uid
@@ -41,9 +46,7 @@ export async function GET(req: NextRequest) {
     const points = 100;
     return NextResponse.json({ points }, { status: 200 });
 
-  } catch (e) {
-    console.error('Token verification failed', e);
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }
-

@@ -34,6 +34,7 @@ export async function listLayoutHistory(pageKey: PageKey): Promise<LayoutVersion
     FROM site_layout_versions
     WHERE page_key = ${pageKey}
     ORDER BY created_at DESC
+    LIMIT 20
   `) as LayoutVersionRow[];
 
   return rows.map((row) => ({

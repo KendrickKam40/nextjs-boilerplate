@@ -1,0 +1,7 @@
+{
+  "mode": "builtin imagegen edit",
+  "reference": "public/images/brand/nasi-goreng.png",
+  "asset": "public/images/brand/floating-nasi-goreng.png",
+  "transparent_background": true,
+  "prompt": "Create a premium realistic restaurant food cutout asset, based closely on the attached Balibu nasi goreng photograph. Preserve this appetizing dish identity and warm photographic styling: golden Indonesian fried rice with chicken, scallion and sliced red chilli, one perfect golden-yolk fried egg with crisp lacy edges and crispy shallots on top; neatly grouped cucumber slices, lime wedge, small rich red sambal ramekin and fresh herbs, all contained on one dark charcoal speckled ceramic dinner plate. CRITICAL: camera is DIRECTLY OVERHEAD, straight 90 degree top-down, plate is a complete circular plate, not oblique elliptical. Entire plate completely visible with a generous 7% transparent margin on every side. Isolate ONLY the plate and its food on an ACTUAL transparent background. No wooden table, no fabric, no additional props outside plate, no text, no logo, no graphic labels. No cast shadow outside the plate, we will add shadows in CSS. Natural studio side lighting, beautiful rich but believable colors, extraordinary rice texture and realistic food, dark handmade ceramic rim. Exact crisp silhouette for use as a floating dish in a dimensional website. Square image. This must remain appetizing food photography, not illustration or a 3D cartoon."
+}

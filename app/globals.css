@@ -1,56 +1,54 @@
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Montserrat:wght@400;600;700&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --heading-primary: var(--foreground);
-  --heading-secondary: var(--foreground);
-  --site-background: #FAF3EA;
-  --font-serif: 'Oswald', sans-serif;
-  --font-sans: 'Montserrat', sans-serif;
+  --background: #fff3df;
+  --foreground: #1d5a35;
+  --site-background: #fff3df;
+  --heading-primary: #1d5a35;
+  --heading-secondary: #1d5a35;
+  --font-serif: var(--font-display), Impact, sans-serif;
+  --font-sans: var(--font-body), Arial, sans-serif;
 }
 
-/* retain your colour variables so API colours can override if needed */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body), Arial, sans-serif;
+  --font-serif: var(--font-display), Impact, sans-serif;
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
-/* Base styles */
+html {
+  position: relative;
+  scroll-behavior: smooth;
+  scroll-padding-top: 110px;
+}
 body {
-  /* Always start from a clean white canvas */
-  background: #ffffff;
+  margin: 0;
+  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
-  font-weight: 400;
+  font-family: var(--font-body), Arial, sans-serif;
 }
-
-/* Bold, serif headings reminiscent of Staays editorial tone */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--heading-secondary, var(--foreground));
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
 }
-
-h1, h2 {
-  color: var(--heading-primary, var(--foreground));
+button {
+  cursor: pointer;
 }
-
-
-/* Ensure other text elements use your sans-serif body font */
-p, a, span, li {
-  font-family: var(--font-sans);
-  font-weight: 400;
+button:disabled {
+  cursor: default;
+}
+:focus-visible {
+  outline: 3px solid #d94b31;
+  outline-offset: 5px;
+}
+::selection {
+  background: #f6c445;
+  color: #16402a;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

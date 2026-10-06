@@ -1,0 +1,417 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T00:00:00Z",
+  "title": "Design System: Balibu",
+  "extensions": {
+    "colorMeta": {
+      "sambal-red": {
+        "role": "primary",
+        "displayName": "Sambal Red",
+        "canonical": "oklch(52.7% 0.182 31.3)",
+        "tonalRamp": [
+          "#1e0100",
+          "#490500",
+          "#790e01",
+          "#ad1b05",
+          "#d34631",
+          "#fb6a53",
+          "#ffac9c",
+          "#fee9e5"
+        ]
+      },
+      "sambal-deep": {
+        "role": "primary",
+        "displayName": "Sambal Deep",
+        "canonical": "color-mix(in srgb, var(--b-accent) 88%, #000)",
+        "tonalRamp": [
+          "#1e0000",
+          "#490500",
+          "#7a0b00",
+          "#a62918",
+          "#cc4e3b",
+          "#f3715c",
+          "#feac9c",
+          "#fee9e5"
+        ]
+      },
+      "pandan-leaf": {
+        "role": "secondary",
+        "displayName": "Pandan Leaf",
+        "canonical": "oklch(41.8% 0.088 153.4)",
+        "tonalRamp": [
+          "#001004",
+          "#002d14",
+          "#0b4d29",
+          "#306c46",
+          "#518d64",
+          "#72af85",
+          "#98d5aa",
+          "#c6ffd6"
+        ]
+      },
+      "pandan-muted": {
+        "role": "neutral",
+        "displayName": "Pandan Muted",
+        "canonical": "color-mix(in srgb, var(--b-ink) 80%, var(--b-paper))",
+        "tonalRamp": [
+          "#001004",
+          "#002d12",
+          "#1c4b2b",
+          "#3b6a49",
+          "#5b8a67",
+          "#7bac88",
+          "#a0d3ad",
+          "#cafed6"
+        ]
+      },
+      "palm-sugar": {
+        "role": "tertiary",
+        "displayName": "Palm Sugar",
+        "canonical": "oklch(84.3% 0.149 86.5)",
+        "tonalRamp": [
+          "#110a00",
+          "#2f2200",
+          "#513c00",
+          "#765902",
+          "#9c7705",
+          "#c5970a",
+          "#eebc3b",
+          "#ffedc5"
+        ]
+      },
+      "coconut-cream": {
+        "role": "neutral",
+        "displayName": "Coconut Cream",
+        "canonical": "oklch(96.8% 0.029 80.7)",
+        "tonalRamp": [
+          "#110a00",
+          "#2b2313",
+          "#483e2e",
+          "#665c4b",
+          "#867c6a",
+          "#a89d8a",
+          "#cec3af",
+          "#f9edd9"
+        ]
+      },
+      "cream-on-pandan-muted": {
+        "role": "neutral",
+        "displayName": "Cream on Pandan Muted",
+        "canonical": "color-mix(in srgb, var(--b-paper) 78%, var(--b-ink))",
+        "tonalRamp": [
+          "#0b0d01",
+          "#232614",
+          "#3f422f",
+          "#5d604c",
+          "#7c806b",
+          "#9da18b",
+          "#c3c7b0",
+          "#edf1da"
+        ]
+      },
+      "pandan-line": {
+        "role": "neutral",
+        "displayName": "Pandan Line",
+        "canonical": "color-mix(in srgb, var(--b-ink) 18%, transparent)",
+        "tonalRamp": [
+          "#001004",
+          "#002d14",
+          "#0b4d29",
+          "#306c46",
+          "#518d64",
+          "#72af85",
+          "#98d5aa",
+          "#c6ffd6"
+        ]
+      },
+      "pandan-line-soft": {
+        "role": "neutral",
+        "displayName": "Pandan Line Soft",
+        "canonical": "color-mix(in srgb, var(--b-ink) 10%, transparent)",
+        "tonalRamp": [
+          "#001004",
+          "#002d14",
+          "#0b4d29",
+          "#306c46",
+          "#518d64",
+          "#72af85",
+          "#98d5aa",
+          "#c6ffd6"
+        ]
+      },
+      "open-green": {
+        "role": "neutral",
+        "displayName": "Open Green",
+        "canonical": "oklch(71.2% 0.180 147.2)",
+        "tonalRamp": [
+          "#001002",
+          "#012d0b",
+          "#024e19",
+          "#007227",
+          "#029737",
+          "#3abb56",
+          "#67e37c",
+          "#c9ffce"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero \"BIG FLAVOUR.\" only; painted shadow in palm sugar."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section heads and footer sign; sized per field from clamp(48px, 7vw, 120px) to clamp(64px, 13vw, 220px); always painted."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Ticket, note and visit-card headings; Bungee list rows at larger list scale."
+      },
+      "script": {
+        "displayName": "Script",
+        "purpose": "Yellowtail asides in headings (0.36em to 1.05em, rotated) and standalone notes; pandan-stroked when over lettering."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The one bold line of copy under a heading."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Dish descriptions, visit note, item rows."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Pill text; nav at 14px; prices at 17px tabular."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Open chip, counts, captions and small print; 13px working floor, 12px only for the phone sub-line."
+      }
+    },
+    "shadows": [
+      {
+        "name": "painted-lettering",
+        "value": "text-shadow: 0.045em 0.05em 0 var(--b-shadow, var(--b-gold))",
+        "purpose": "Hard sign-writer shadow on display lettering only; colour is the field complement."
+      },
+      {
+        "name": "script-outline",
+        "value": "-webkit-text-stroke: 0.09em var(--b-ink); paint-order: stroke fill; text-shadow: 0.04em 0.05em 0 var(--b-ink)",
+        "purpose": "Script laid over other lettering."
+      },
+      {
+        "name": "food-contact",
+        "value": "filter: drop-shadow(0 26px 22px #0006)",
+        "purpose": "Contact shadow under transparent food cutouts (hero plate uses 0 30px 30px #0005)."
+      },
+      {
+        "name": "sticker-lift",
+        "value": "0 0 0 3px var(--b-ink), 0 10px 24px #0003",
+        "purpose": "Specials sticker overlapping the Featured dish."
+      },
+      {
+        "name": "overlay",
+        "value": "0 10px 24px #0004",
+        "purpose": "Fixed mobile order pill over content."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 3px solid var(--b-gold); outline-offset: 3px; box-shadow: 0 0 0 6px var(--b-ink)",
+        "purpose": "Every focusable element."
+      },
+      {
+        "name": "pinstripe",
+        "value": "border: 3px solid var(--b-ink); outline: 2px solid var(--b-ink); outline-offset: -11px",
+        "purpose": "Cart panel border with painted inner pinstripe."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-paint",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Pill tilt, nav underline wipe, list slides, hero plate entrance."
+      },
+      {
+        "name": "pill-hover",
+        "value": "transform: translateY(-2px) rotate(-1.5deg) 180ms",
+        "purpose": "Pill hover on hover-capable devices; active scale(0.98)."
+      },
+      {
+        "name": "hero-plate-entrance",
+        "value": "scale 0.86 -> 1, rotate -30deg -> 0, opacity 0 -> 1, 1.2s, delay 0.15s",
+        "purpose": "Hero plate arrival (framer-motion); skipped under reduced motion."
+      },
+      {
+        "name": "hero-plate-scroll",
+        "value": "rotate -10deg -> 38deg, y 0% -> -14% over hero scroll",
+        "purpose": "Scroll-linked plate turn; static at -10deg under reduced motion."
+      },
+      {
+        "name": "ticker-roll",
+        "value": "translateX(-50%) 38s linear infinite",
+        "purpose": "Ticker band; pauses on hover, none under reduced motion."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation/transition-duration: 0.01ms",
+        "purpose": "Site-wide flattening under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack",
+        "value": "900px"
+      },
+      {
+        "name": "phone",
+        "value": "700px"
+      },
+      {
+        "name": "short-landscape",
+        "value": "max-height 560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Cream Pill Button",
+      "kind": "button",
+      "refersTo": "button-pill-cream",
+      "description": "Primary action on sambal fields and in the sign bar.",
+      "html": "<div class=\"ds-field-cream\"><button class=\"ds-pill ds-pill-cream\">ORDER ONLINE <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 17L17 7M8 7h9v9\"/></svg></button></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-pill{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 26px;border:2px solid currentColor;border-radius:999px;font-family:var(--b-sign);font-size:15px;letter-spacing:.02em;line-height:1;white-space:nowrap;cursor:pointer;transition:transform 180ms cubic-bezier(.22,1,.36,1),background 180ms ease,color 180ms ease;} .ds-pill svg{transition:transform 220ms cubic-bezier(.22,1,.36,1);} .ds-pill:hover{transform:translateY(-2px) rotate(-1.5deg);} .ds-pill:hover svg{transform:translate(2px,-2px);} .ds-pill:active{transform:scale(.98);} .ds-pill:focus-visible{outline:3px solid var(--b-gold);outline-offset:3px;box-shadow:0 0 0 6px var(--b-ink);} .ds-field-cream{background:var(--b-accent);padding:24px;} .ds-pill-cream{background:var(--b-paper);border-color:var(--b-paper);color:var(--b-accent);}"
+    },
+    {
+      "name": "Gold Pill Button",
+      "kind": "button",
+      "refersTo": "button-pill-gold",
+      "description": "Action on red and green fields; the fixed mobile order bar.",
+      "html": "<div class=\"ds-field-gold\"><button class=\"ds-pill ds-pill-gold\">ORDER ONLINE <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 17L17 7M8 7h9v9\"/></svg></button></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-pill{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 26px;border:2px solid currentColor;border-radius:999px;font-family:var(--b-sign);font-size:15px;letter-spacing:.02em;line-height:1;white-space:nowrap;cursor:pointer;transition:transform 180ms cubic-bezier(.22,1,.36,1),background 180ms ease,color 180ms ease;} .ds-pill svg{transition:transform 220ms cubic-bezier(.22,1,.36,1);} .ds-pill:hover{transform:translateY(-2px) rotate(-1.5deg);} .ds-pill:hover svg{transform:translate(2px,-2px);} .ds-pill:active{transform:scale(.98);} .ds-pill:focus-visible{outline:3px solid var(--b-gold);outline-offset:3px;box-shadow:0 0 0 6px var(--b-ink);} .ds-field-gold{background:var(--b-ink);padding:24px;} .ds-pill-gold{background:var(--b-gold);border-color:var(--b-gold);color:var(--b-ink);}"
+    },
+    {
+      "name": "Ink Pill Button",
+      "kind": "button",
+      "refersTo": "button-pill-ink",
+      "description": "Action on palm-sugar fields and inside cream tickets.",
+      "html": "<div class=\"ds-field-ink\"><button class=\"ds-pill ds-pill-ink\">ORDER ONLINE <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 17L17 7M8 7h9v9\"/></svg></button></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-pill{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 26px;border:2px solid currentColor;border-radius:999px;font-family:var(--b-sign);font-size:15px;letter-spacing:.02em;line-height:1;white-space:nowrap;cursor:pointer;transition:transform 180ms cubic-bezier(.22,1,.36,1),background 180ms ease,color 180ms ease;} .ds-pill svg{transition:transform 220ms cubic-bezier(.22,1,.36,1);} .ds-pill:hover{transform:translateY(-2px) rotate(-1.5deg);} .ds-pill:hover svg{transform:translate(2px,-2px);} .ds-pill:active{transform:scale(.98);} .ds-pill:focus-visible{outline:3px solid var(--b-gold);outline-offset:3px;box-shadow:0 0 0 6px var(--b-ink);} .ds-field-ink{background:var(--b-gold);padding:24px;} .ds-pill-ink{background:var(--b-ink);border-color:var(--b-ink);color:var(--b-paper);}"
+    },
+    {
+      "name": "Sign Bar",
+      "kind": "nav",
+      "refersTo": "sign-bar",
+      "description": "Sticky sambal bar with logo roundel, Bungee links with a gold wipe underline, and the cream Order pill.",
+      "html": "<header class=\"ds-bar\"><span class=\"ds-roundel\">B</span><nav class=\"ds-nav\"><a href=\"#\">MENU</a><a href=\"#\">OUR STORY</a><a href=\"#\">FEATURED</a><a href=\"#\">VISIT</a></nav><button class=\"ds-pill ds-pill-cream ds-bar-order\">ORDER ONLINE <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 17L17 7M8 7h9v9\"/></svg></button></header>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-pill{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 26px;border:2px solid currentColor;border-radius:999px;font-family:var(--b-sign);font-size:15px;letter-spacing:.02em;line-height:1;white-space:nowrap;cursor:pointer;transition:transform 180ms cubic-bezier(.22,1,.36,1),background 180ms ease,color 180ms ease;} .ds-pill svg{transition:transform 220ms cubic-bezier(.22,1,.36,1);} .ds-pill:hover{transform:translateY(-2px) rotate(-1.5deg);} .ds-pill:hover svg{transform:translate(2px,-2px);} .ds-pill:active{transform:scale(.98);} .ds-pill:focus-visible{outline:3px solid var(--b-gold);outline-offset:3px;box-shadow:0 0 0 6px var(--b-ink);} .ds-pill-cream{background:var(--b-paper);border-color:var(--b-paper);color:var(--b-accent);} .ds-bar{display:flex;align-items:center;gap:32px;height:72px;padding:0 32px;background:var(--b-accent);color:var(--b-on-accent);border-bottom:2px solid color-mix(in srgb,var(--b-on-accent) 22%,transparent);} .ds-roundel{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--b-paper);color:var(--b-accent);font-family:var(--b-sign);transition:transform 220ms cubic-bezier(.22,1,.36,1);} .ds-roundel:hover{transform:rotate(-8deg);} .ds-nav{display:flex;gap:28px;margin-left:auto;} .ds-nav a{position:relative;display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:none;font-family:var(--b-sign);font-size:14px;letter-spacing:.03em;} .ds-nav a::after{content:\"\";position:absolute;left:0;right:0;bottom:8px;height:3px;border-radius:3px;background:var(--b-gold);transform:scaleX(0);transform-origin:left;transition:transform 220ms cubic-bezier(.22,1,.36,1);} .ds-nav a:hover::after{transform:scaleX(1);} .ds-nav a:focus-visible{outline:3px solid var(--b-gold);outline-offset:3px;} .ds-bar-order{min-height:46px;padding:0 20px;font-size:13px;}"
+    },
+    {
+      "name": "Ticker Band",
+      "kind": "custom",
+      "refersTo": "ticker-band",
+      "description": "Rolling palm-sugar banner of verified dishes between fields; pauses on hover, static under reduced motion.",
+      "html": "<div class=\"ds-ticker\"><div class=\"ds-track\"><ul><li><span>Nasi goreng</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Mie goreng</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Rendang</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Bakso</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Milkshakes</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Smoothies</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Slushies</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Soft serve</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>T.29 Esk Eats</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li></ul><ul aria-hidden=\"true\"><li><span>Nasi goreng</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Mie goreng</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Rendang</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Bakso</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Milkshakes</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Smoothies</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Slushies</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>Soft serve</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li><li><span>T.29 Esk Eats</span><svg class=\"ds-star\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 0l2.6 8.2L24 12l-9.4 3.8L12 24l-2.6-8.2L0 12l9.4-3.8z\" fill=\"currentColor\"/></svg></li></ul></div></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-ticker{overflow:hidden;border-block:3px solid var(--b-ink);background:var(--b-gold);color:var(--b-ink);} .ds-track{display:flex;width:max-content;animation:ds-roll 38s linear infinite;} .ds-ticker:hover .ds-track{animation-play-state:paused;} .ds-ticker ul{display:flex;margin:0;padding:0;list-style:none;} .ds-ticker li{display:flex;align-items:center;gap:28px;padding:16px 14px;font-family:var(--b-sign);font-size:28px;line-height:1;white-space:nowrap;text-transform:uppercase;} .ds-star{width:.7em;height:.7em;color:var(--b-accent);} @keyframes ds-roll{to{transform:translateX(-50%);}} @media (prefers-reduced-motion:reduce){.ds-track{animation:none;}}"
+    },
+    {
+      "name": "Cart Panel",
+      "kind": "card",
+      "refersTo": "cart-panel",
+      "description": "Cream panel with a 3px pandan border and a pinstripe painted 11px inside; the menu ticket and Featured note.",
+      "html": "<div class=\"ds-field-green\"><div class=\"ds-panel\"><h3>NASI GORENG</h3><p>Fried rice with a fried egg, crackers and sambal.</p><ul><li><span>Nasi goreng</span><span class=\"ds-price\">$—</span></li><li><span>Mie goreng</span><span class=\"ds-price\">$—</span></li></ul></div></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-field-green{background:var(--b-ink);padding:32px;} .ds-panel{padding:32px;background:var(--b-paper);color:var(--b-ink);border:3px solid var(--b-ink);border-radius:28px;outline:2px solid var(--b-ink);outline-offset:-11px;font-family:Manrope,Arial,sans-serif;} .ds-panel h3{margin:0;font-family:var(--b-sign);font-weight:400;font-size:32px;line-height:.95;} .ds-panel p{margin:10px 0 0;max-width:44ch;color:color-mix(in srgb,var(--b-ink) 80%,var(--b-paper));font-size:16px;line-height:1.5;} .ds-panel ul{margin:18px 0 0;padding:0;list-style:none;border-top:2px dashed color-mix(in srgb,var(--b-ink) 18%,transparent);} .ds-panel li{display:flex;justify-content:space-between;gap:20px;padding:12px 0;border-bottom:2px dashed color-mix(in srgb,var(--b-ink) 10%,transparent);font-weight:700;} .ds-price{font-family:var(--b-sign);font-weight:400;font-variant-numeric:tabular-nums;}"
+    },
+    {
+      "name": "Open Chip",
+      "kind": "chip",
+      "refersTo": "open-chip",
+      "description": "Live open state with a status dot; inherits the colour of its field.",
+      "html": "<div class=\"ds-field-red\"><span class=\"ds-chip\" data-open=\"true\"><span></span>Open now · until 9 pm</span><span class=\"ds-chip\" data-open=\"false\"><span></span>Closed · opens 10 am</span></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-field-red{display:flex;gap:28px;padding:24px;background:var(--b-accent);color:var(--b-on-accent);font-family:Manrope,Arial,sans-serif;} .ds-chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;} .ds-chip>span{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.55;} .ds-chip[data-open=\"true\"]>span{opacity:1;background:#3fbf5a;box-shadow:0 0 0 3px color-mix(in srgb,#3fbf5a 30%,transparent);}"
+    },
+    {
+      "name": "Painted Heading",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Bungee capitals with the hard painted shadow and a Yellowtail aside; outlined when the script crosses the capitals.",
+      "html": "<div class=\"ds-field-red\"><h2 class=\"ds-heading\"><span class=\"ds-painted\">BIG FLAVOUR.</span><em class=\"ds-script ds-script-outlined\">Bali soul.</em></h2></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-field-red{padding:32px;background:var(--b-accent);} .ds-heading{position:relative;margin:0;font-family:var(--b-sign);font-weight:400;font-size:72px;line-height:.86;letter-spacing:-.01em;color:var(--b-on-accent);} .ds-painted{display:block;text-shadow:.045em .05em 0 var(--b-gold);} .ds-script{display:block;margin:-.3em 0 0 1.2em;font-family:var(--b-script);font-style:normal;font-size:.6em;line-height:1;color:var(--b-gold);rotate:-8deg;} .ds-script-outlined{-webkit-text-stroke:.09em var(--b-ink);paint-order:stroke fill;text-shadow:.04em .05em 0 var(--b-ink);}"
+    },
+    {
+      "name": "Counter Sticker",
+      "kind": "custom",
+      "refersTo": "counter-sticker",
+      "description": "The real counter photo as a tilted 32px-rounded print with a gold Bungee pill label.",
+      "html": "<div class=\"ds-field-red\"><figure class=\"ds-print\"><div class=\"ds-photo\"><span>T.29 ESK EATS</span></div></figure></div>",
+      "css": ":host{--b-paper:#fff3df;--b-ink:#1d5a35;--b-accent:#bd2f1b;--b-on-accent:#fff3df;--b-gold:#f6c445;--b-sign:Bungee,\"Arial Black\",sans-serif;--b-script:Yellowtail,\"Brush Script MT\",cursive;} .ds-field-red{padding:40px;background:var(--b-accent);} .ds-print{margin:0;max-width:360px;} .ds-photo{position:relative;aspect-ratio:4/3;border-radius:32px;background:var(--b-ink);box-shadow:0 0 0 3px var(--b-on-accent);rotate:1.5deg;} .ds-photo>span{position:absolute;left:18px;bottom:18px;padding:8px 16px;border-radius:999px;background:var(--b-gold);color:var(--b-ink);font-family:var(--b-sign);font-size:14px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Gerobak",
+    "overview": "**Creative North Star: \"The Gerobak\"**\n\nBalibu is painted like an Indonesian food cart and warung signboard: whole sections drenched in one flat colour, fat block-capital lettering that fills the width, a sign-writer's script flourish cutting across it, and real food cut out and set straight onto the paint at huge scale. The page reads as a sequence of painted cart panels (sambal red, pandan green, palm-sugar yellow, sambal red again, pandan green for the footer), stitched together by a scrolling ticker band, under a sticky red sign bar that always carries Order online.\n\nDensity is loud and low: few words per field, enormous display type, one lead line of bold Manrope, then a pill. Depth is paint, not material: a hard offset shadow under display lettering, a pinstripe inside the cart panels, and soft contact shadows only under the food cutouts. The world explicitly replaces the previous cream-paper editorial page with italic serif, hairline rules and photo cards.\n\nColours are owner-editable in /admin, so every surface reads from the five base tokens and derives the rest. An owner pick that would make text hard to read is ignored and the Balibu colour stays.",
+    "keyCharacteristics": [
+      "Drenched single-colour section fields, never tinted cards on a neutral page.",
+      "Bungee block capitals for every headline, with a painted hard shadow.",
+      "Yellowtail script for asides that cut across or hang off the capitals.",
+      "Food as transparent cutouts on the field, never framed photo cards.",
+      "Pill buttons like painted enamel plates; a tilt on hover.",
+      "A rolling ticker band of real dishes between fields."
+    ],
+    "rules": [
+      {
+        "name": "The Drenched Field Rule",
+        "body": "Every section is one flat field of a single enamel, edge to edge: red hero, green Menu, red Story, gold Featured, red Visit, green footer. Fields meet at a hard seam or a ticker band, never a gradient or a tinted card.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Red-on-Green Rule",
+        "body": "Sambal and pandan are never set as text and ground for each other (1.4:1). Green may sit on red only as a painted shadow, a script outline stroke, or a solid panel carrying cream text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gold Is Large Rule",
+        "body": "Palm sugar on sambal, and sambal on palm sugar, only at display or script sizes (26px and up); at 3.6:1 they are not text colours for reading copy.",
+        "section": "colors"
+      },
+      {
+        "name": "The Derived Tokens Rule",
+        "body": "Only the five owner-editable bases are literal. Muted text, rules and on-colours are color-mix derivations of them, so an owner theme keeps its contrast. On-accent text is chosen by the resolver from cream, white or near-black, whichever reads best on the owner's red.",
+        "section": "colors"
+      },
+      {
+        "name": "The Painted Lettering Rule",
+        "body": "The hard sign-writer's shadow (0.045em 0.05em, no blur) goes on display lettering only: hero, section heads, footer sign, and the active item in a Bungee list. Its colour is the field's complementary enamel: gold under cream on red, sambal under cream on green, cream under green on gold, pandan under cream on red story fields. Never on body, labels or pills.",
+        "section": "typography"
+      },
+      {
+        "name": "The Outlined Script Rule",
+        "body": "When script is laid over other lettering (hero \"Bali soul.\", story aside) it takes a pandan stroke of 0.09em painted under the fill plus a 0.04em hard pandan shadow. Script that sits clear of the capitals stays unstroked.",
+        "section": "typography"
+      },
+      {
+        "name": "The Cutout Not Card Rule",
+        "body": "Food is a transparent cutout placed directly on the field with a contact shadow, allowed to overlap lettering, tickets and seams. It never sits in a framed photo card. The one rectangular photograph is the real counter, treated as a stuck-on print.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** give each new section one drenched enamel field and pick a composition that differs from its neighbours.",
+      "**Do** set every headline in Bungee capitals with the painted shadow in the field's complementary enamel.",
+      "**Do** lay a Yellowtail aside across or under the capitals, rotated -5deg to -8deg, stroked in pandan when it overlaps lettering.",
+      "**Do** put food on the field as a transparent cutout with a contact drop-shadow, large enough to overlap a seam, ticket or letter.",
+      "**Do** use pill buttons (cream on red, gold on red or green, ink on gold or cream) for every action, with Order online always reachable.",
+      "**Do** derive any new colour from the five base tokens with color-mix so owner themes keep their contrast.",
+      "**Do** keep reading text at 13px or larger and gold-on-red pairings at display size.",
+      "**Do** give every motion a reduced-motion state that is static and complete."
+    ],
+    "donts": [
+      "**Don't** set sambal text on pandan or pandan text on sambal.",
+      "**Don't** put the painted shadow on body copy, labels, pills or the script used as plain copy.",
+      "**Don't** frame food in photo cards or rectangles; the counter photo is the only print.",
+      "**Don't** return to the cream-paper editorial page: italic serif asides, hairline 1px rules and small tracked uppercase labels belong to the replaced world.",
+      "**Don't** put a dish, price, rating, review quote or \"favourite\" claim in the ticker, a label or a sticker unless it is a verified menu fact or comes from the live feed.",
+      "**Don't** hard-code an owner-editable colour in a component; read the token so /admin overrides and the contrast guard apply."
+    ]
+  }
+}

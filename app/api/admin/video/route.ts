@@ -1,26 +1,10 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { getAdminCookieName, verifySessionToken } from '@/lib/auth';
+import { requireAdmin } from '@/lib/admin-guard';
 import { sql } from '@/lib/db';
+import { parseYouTubeLink } from '@/lib/youtube';
 
-function isValidUrl(url: string) {
-  try {
-    const u = new URL(url);
-    return u.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
+const MAX_VIDEOS = 50;
 
-async function requireAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(getAdminCookieName())?.value;
-  const payload = verifySessionToken(token);
-  if (!payload) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  return null;
-}
 
 async function readPlaylist(): Promise<string[]> {
   const rows = (await sql`SELECT url FROM playlist_items ORDER BY position ASC`) as { url: string }[];
@@ -41,8 +25,15 @@ async function writePlaylist(urls: string[]) {
 }
 
 export async function GET() {
-  const urls = await readPlaylist();
-  return NextResponse.json({ videoUrls: urls });
+  const authErr = await requireAdmin();
+  if (authErr) return authErr;
+  try {
+    const urls = await readPlaylist();
+    return NextResponse.json({ videoUrls: urls });
+  } catch (error) {
+    console.error('[admin/video] playlist read failed', error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: 'The video list can’t be loaded right now. Try again in a minute.' }, { status: 503 });
+  }
 }
 
 export async function POST(req: Request) {
@@ -53,23 +44,34 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    return NextResponse.json({ error: 'Something went wrong sending the list. Try saving again.' }, { status: 400 });
   }
   const rawList = body?.videoUrls;
-  if (!Array.isArray(rawList) || rawList.length === 0) {
-    return NextResponse.json({ error: 'videoUrls must be a non-empty array' }, { status: 422 });
-  }
-  const cleaned = rawList
-    .map((v: any) => (v || '').toString().trim())
-    .filter(Boolean);
+  const cleaned = Array.isArray(rawList)
+    ? rawList.map((v: unknown) => String(v ?? '').trim()).filter(Boolean)
+    : [];
   if (cleaned.length === 0) {
-    return NextResponse.json({ error: 'videoUrls must contain at least one URL' }, { status: 422 });
+    return NextResponse.json({ error: 'Add at least one YouTube video before saving.' }, { status: 422 });
   }
-  const invalid = cleaned.find((u: string) => !isValidUrl(u));
-  if (invalid) {
-    return NextResponse.json({ error: `Invalid https URL: ${invalid}` }, { status: 422 });
+  if (cleaned.length > MAX_VIDEOS) {
+    return NextResponse.json({ error: `The store screen can hold up to ${MAX_VIDEOS} videos.` }, { status: 422 });
+  }
+  const problems = cleaned.flatMap((url, index) => {
+    const link = parseYouTubeLink(url);
+    return link.ok ? [] : [{ index, message: link.reason }];
+  });
+  if (problems.length) {
+    return NextResponse.json(
+      { error: problems.length === 1 ? 'One video link needs fixing.' : `${problems.length} video links need fixing.`, problems },
+      { status: 422 },
+    );
   }
 
-  await writePlaylist(cleaned);
-  return NextResponse.json({ ok: true, videoUrls: cleaned });
+  try {
+    await writePlaylist(cleaned);
+    return NextResponse.json({ ok: true, videoUrls: cleaned });
+  } catch (error) {
+    console.error('[admin/video] playlist write failed', error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: 'The video list wasn’t saved. Try again in a minute.' }, { status: 503 });
+  }
 }

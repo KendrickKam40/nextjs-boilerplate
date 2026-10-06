@@ -1,0 +1,50 @@
+.ticker {
+  overflow: hidden;
+  border-block: 3px solid var(--b-ink);
+  background: var(--b-gold);
+  color: var(--b-ink);
+}
+.ticker[data-tone='red'] {
+  border-color: var(--b-ink);
+  background: var(--b-accent);
+  color: var(--b-on-accent);
+}
+.track {
+  display: flex;
+  width: max-content;
+  animation: roll 38s linear infinite;
+}
+@media (hover: hover) {
+  .ticker:hover .track { animation-play-state: paused; }
+}
+.run {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.run li {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 34px);
+  padding: 16px clamp(9px, 1.2vw, 17px);
+  font-family: var(--b-sign);
+  font-size: clamp(20px, 2.6vw, 36px);
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.star {
+  width: 0.7em;
+  height: 0.7em;
+  color: var(--b-accent);
+}
+.ticker[data-tone='red'] .star {
+  color: var(--b-gold);
+}
+@keyframes roll {
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .track { animation: none; }
+}

@@ -1,0 +1,317 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: min(1120px, calc(100vw - 64px));
+  max-width: none;
+  height: min(880px, calc(100dvh - 64px));
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 6px;
+  background: var(--b-paper);
+  color: var(--b-ink);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  box-shadow: 0 30px 100px #0005;
+}
+
+.dialog[open] {
+  animation: arrive 350ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.dialog::backdrop {
+  background: rgb(16 18 15 / 72%);
+  backdrop-filter: blur(8px);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 28px;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  min-width: 0;
+}
+
+.logo {
+  width: 80px;
+}
+
+.divider {
+  width: 1px;
+  height: 38px;
+  background: var(--b-line);
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--b-accent-ink);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(15px, 2vw, 20px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+}
+
+.close {
+  display: grid;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--b-line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--b-ink);
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.close:hover {
+  transform: rotate(90deg);
+  border-color: var(--b-ink);
+  background: var(--b-ink);
+  color: var(--b-paper);
+}
+
+.close:focus-visible,
+.serviceBar a:focus-visible,
+.slowNotice a:focus-visible {
+  outline: 3px solid var(--b-accent);
+  outline-offset: 4px;
+}
+
+.serviceBar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 28px;
+  border-top: 1px solid var(--b-line);
+  border-bottom: 1px solid var(--b-line);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.serviceInfo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  color: var(--b-muted);
+}
+
+.serviceBar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--b-ink);
+  border-radius: 100px;
+  color: var(--b-ink);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.serviceBar a:hover {
+  background: var(--b-ink);
+  color: var(--b-paper);
+}
+
+.frameContainer {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #fff;
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: var(--b-paper);
+  text-align: center;
+  pointer-events: none;
+}
+
+.loading p {
+  margin: 5px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.loading > span {
+  color: var(--b-muted);
+  font-size: 13px;
+}
+
+.spinner {
+  color: var(--b-accent);
+  animation: spin 900ms linear infinite;
+}
+
+.slowNotice {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  margin-inline: auto;
+  padding: 14px 18px;
+  border: 1px solid var(--b-line);
+  border-radius: 4px;
+  background: var(--b-paper);
+  box-shadow: 0 4px 20px #191a1712;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.slowNotice a {
+  color: var(--b-accent-ink);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px), (max-height: 550px) and (max-width: 950px) {
+  .dialog {
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .panel {
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .header {
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .heading {
+    gap: 12px;
+  }
+
+  .logo {
+    width: 44px;
+    flex-shrink: 0;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .title {
+    max-width: 170px;
+    font-size: 15px;
+  }
+
+  .serviceBar {
+    justify-content: flex-end;
+    padding: 0 16px;
+  }
+
+  .serviceInfo {
+    display: none !important;
+  }
+
+  .serviceBar a {
+    min-height: 44px;
+  }
+}
+
+@media (max-height: 550px) and (max-width: 950px) {
+  .header {
+    padding-block: 6px;
+  }
+  .title {
+    max-width: none;
+  }
+  .eyebrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open],
+  .spinner {
+    animation: none;
+  }
+
+  .close {
+    transition: none;
+  }
+}
