@@ -162,7 +162,7 @@ export default function CommerceDialog({ mode, onClose, openNow }: CommerceDialo
 
           <div className={styles.serviceBar}>
             <span className={styles.serviceInfo}>
-              <span>T.29, Esk Eats · Invercargill Central</span>
+              <span>Esk Eats · Invercargill Central</span>
               <OpenChip state={openNow ?? null} />
             </span>
             <a href={destination.url} target="_blank" rel="noopener noreferrer">

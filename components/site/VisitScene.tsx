@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { ArrowUpRight, Clock3, MapPin, Navigation, Phone } from 'lucide-react';
 import type { RestaurantClient } from '@/lib/site-content';
 import type { OpenState } from '@/lib/site-hours';
@@ -37,8 +36,8 @@ export default function VisitScene({
   return (
     <section id="contact" className={styles.section} aria-labelledby="visit-heading">
       <div className={styles.copy}>
-        <h2 id="visit-heading" className={`${styles.heading} b-painted`}>
-          FIND US ON <em className="b-script">Esk Street.</em>
+        <h2 id="visit-heading" className={styles.heading}>
+          Find us on Esk Street.
         </h2>
         <p className={styles.venue}>{BALIBU_LOCATION.venue}</p>
         <OpenChip state={openNow} className={styles.open} />
@@ -68,26 +67,8 @@ export default function VisitScene({
         </button>
       </div>
       <div className={styles.visual}>
-        <figure className={styles.counterPrint}>
-          <div className={styles.photo}>
-            <Image
-              src="/images/store/balibu-counter.jpg"
-              alt="Balibu’s counter at Esk Eats, with its red back wall, overhead menus and original round Balibu signs"
-              fill
-              sizes="(max-width:760px) 90vw,46vw"
-            />
-            <span>LOOK FOR THE RED WALL.</span>
-          </div>
-          <figcaption>
-            <a href="https://maps.google.com/maps/contrib/116009927405077998924" target="_blank" rel="noopener noreferrer">
-              Photo: Pang / Google Maps<ArrowUpRight size={12} aria-hidden="true" />
-            </a>
-          </figcaption>
-        </figure>
         <aside className={styles.visitNote} aria-labelledby="counter-heading">
-          <h3 id="counter-heading">
-            MEET YOU <em className="b-script">at the counter.</em>
-          </h3>
+          <h3 id="counter-heading">Meet you at the counter.</h3>
           <p>Find us inside Esk Eats at Invercargill Central. Stop in for a meal, or order online and take a little Balibu with you.</p>
           <a href={BALIBU_LOCATION.parkingUri} target="_blank" rel="noopener noreferrer">
             <span><MapPin size={16} aria-hidden="true" />Parking at Invercargill Central</span><ArrowUpRight size={19} aria-hidden="true" />

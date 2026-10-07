@@ -39,12 +39,12 @@ export const THEME_FIELDS: {
   {
     key: 'primaryColor',
     label: 'Accent',
-    description: 'The red hero, Visit section and top bar.',
+    description: 'The red hero slide, Visit section, top bar and big “NASI GORENG” lettering.',
   },
   {
     key: 'secondaryColor',
     label: 'Highlight',
-    description: 'The yellow Featured section, ticker bands and painted shadows.',
+    description: 'The yellow Something sweet section, the ticker bands and the third hero slide.',
   },
 ];
 

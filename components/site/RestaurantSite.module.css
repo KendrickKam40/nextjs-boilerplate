@@ -1,5 +1,7 @@
 .site {
   min-height: 100svh;
+  /* The tilted ticker overhangs both edges; clip without breaking sticky. */
+  overflow-x: clip;
 }
 .announcement {
   padding: 10px var(--b-gutter);
@@ -52,8 +54,10 @@
   align-items: center;
   min-height: 44px;
   font-family: var(--b-sign);
-  font-size: 14px;
-  letter-spacing: 0.03em;
+  font-size: 19px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 800;
 }
 .nav a::after {
   content: '';
@@ -93,30 +97,13 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 22px;
-  padding: clamp(56px, 9vw, 120px) var(--b-gutter) clamp(48px, 6vw, 96px);
-}
-.footerSign {
-  font-family: var(--b-sign);
-  font-size: clamp(54px, 12vw, 200px);
-  line-height: 0.88;
-  letter-spacing: -0.01em;
-  color: var(--b-paper);
-  --b-shadow: var(--b-accent);
-}
-.footerSign span {
-  color: var(--b-gold);
-}
-.footerScript {
-  margin-top: -6px;
-  font-size: clamp(28px, 4vw, 52px);
-  color: var(--b-gold);
+  padding: clamp(36px, 4vw, 56px) var(--b-gutter) clamp(36px, 4vw, 56px);
 }
 .footerRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 18px 28px;
-  margin-top: 10px;
 }
 .footerLink {
   display: inline-flex;

@@ -42,17 +42,17 @@ export const LAYOUT_SECTIONS: Record<PageKey, LayoutSection[]> = {
     {
       id: 'story',
       label: 'About Balibu',
-      description: 'Balibu’s story with a food photo.',
+      description: 'Balibu’s story beside the photo of the counter.',
     },
     {
       id: 'seasonal',
-      label: 'Featured dishes',
-      description: 'Smoky, spicy and sweet dishes, plus POS items marked as showcase.',
+      label: 'Something sweet',
+      description: 'Milkshakes, smoothies, slushies and sundaes, with live sweet prices from the POS.',
     },
     {
       id: 'contact',
       label: 'Visit us',
-      description: 'Address, opening hours, directions and the counter photo.',
+      description: 'Address, opening hours and directions.',
     },
   ],
 };

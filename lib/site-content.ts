@@ -68,8 +68,8 @@ export const MENU_COLLECTIONS: MenuCollection[] = [
   {
     name: 'Rice & noodles',
     description: 'Nasi goreng, mie goreng, and bakso when you need a bowl of noodle soup with meatballs.',
-    image: FOOD_IMAGES.floatingDish.src,
-    imageAlt: FOOD_IMAGES.floatingDish.alt,
+    image: FOOD_IMAGES.floatingMieGoreng.src,
+    imageAlt: FOOD_IMAGES.floatingMieGoreng.alt,
     kind: 'savoury',
   },
   {
@@ -80,10 +80,24 @@ export const MENU_COLLECTIONS: MenuCollection[] = [
     kind: 'savoury',
   },
   {
+    name: 'Soups & bakso',
+    description: 'Bakso, meatballs and noodles in a clear, savoury broth. Comfort in a bowl.',
+    image: FOOD_IMAGES.floatingBakso.src,
+    imageAlt: FOOD_IMAGES.floatingBakso.alt,
+    kind: 'savoury',
+  },
+  {
+    name: 'Crispy & smashed chicken',
+    description: 'Crunchy fried chicken, smashed and loaded with sambal, with rice on the side.',
+    image: FOOD_IMAGES.floatingSmashedChicken.src,
+    imageAlt: FOOD_IMAGES.floatingSmashedChicken.alt,
+    kind: 'savoury',
+  },
+  {
     name: 'Smoothies & shakes',
     description: 'Milkshakes, smoothies and icy slushies. Brain freeze optional.',
-    image: FOOD_IMAGES.floatingMilkshake.src,
-    imageAlt: FOOD_IMAGES.floatingMilkshake.alt,
+    image: FOOD_IMAGES.cupSmoothie.src,
+    imageAlt: FOOD_IMAGES.cupSmoothie.alt,
     kind: 'drinks',
   },
   {
@@ -99,8 +113,8 @@ export const MENU_COLLECTIONS: MenuCollection[] = [
 const OTHER_COLLECTION: MenuCollection = {
   name: '',
   description: 'See what’s in this section today.',
-  image: FOOD_IMAGES.floatingCurry.src,
-  imageAlt: FOOD_IMAGES.floatingCurry.alt,
+  image: FOOD_IMAGES.floatingDish.src,
+  imageAlt: FOOD_IMAGES.floatingDish.alt,
   kind: 'savoury',
 };
 
@@ -109,10 +123,13 @@ export const BRAND_STORY =
 
 export function collectionFor(name: string): MenuCollection {
   const key = name.toLowerCase();
-  if (/smooth|shake|drink|slush|soda|juice|coffee|tea/.test(key)) return MENU_COLLECTIONS[3];
-  if (/cream|yoghurt|sundae|sweet|dessert/.test(key)) return MENU_COLLECTIONS[4];
-  if (/rice|noodle|goreng|bakso/.test(key)) return MENU_COLLECTIONS[1];
-  if (/satay|grill/.test(key)) return MENU_COLLECTIONS[2];
-  if (/rendang|curry|indonesia/.test(key)) return MENU_COLLECTIONS[0];
+  const byName = (n: string) => MENU_COLLECTIONS.find((c) => c.name === n)!;
+  if (/smooth|shake|drink|slush|soda|juice|coffee|tea/.test(key)) return byName('Smoothies & shakes');
+  if (/cream|yoghurt|sundae|sweet|dessert/.test(key)) return byName('Something sweet');
+  if (/bakso|soto|soup|broth/.test(key)) return byName('Soups & bakso');
+  if (/smash|geprek|crispy|fried chicken/.test(key)) return byName('Crispy & smashed chicken');
+  if (/rice|noodle|goreng|mie|meal/.test(key)) return byName('Rice & noodles');
+  if (/satay|grill/.test(key)) return byName('From the grill');
+  if (/rendang|beef|chicken|indonesia/.test(key)) return byName('Indonesian favourites');
   return OTHER_COLLECTION;
 }

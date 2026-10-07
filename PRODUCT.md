@@ -32,7 +32,7 @@ Indonesian comfort food in a Southland food court, with a warm welcome and drink
 ## Capabilities and Constraints
 
 - Next.js 15 / React 19, CSS Modules for the public site (`components/site/`), Tailwind 4 available, Framer Motion for scroll-linked motion. Fonts are bundled locally with no runtime font CDN.
-- The homepage is one long scroll: hero, then The menu, Our story, Featured and Visit sections in the order and visibility set in `/admin`, with deep links (`#menu`, `#about`, `#flavours`, `#contact`). Order online stays reachable in a sticky bar (and a bottom bar on phones).
+- The homepage is one long scroll: hero slideshow and a “NASI GORENG” feature, then The menu, Our story, Something sweet and Visit sections in the order and visibility set in `/admin`, with deep links (`#menu`, `#about`, `#flavours`, `#contact`). Order online stays reachable in a sticky bar (and a bottom bar on phones).
 - The public site must render without backend credentials. Editorial collections never invent prices or availability; live prices come only from the restaurant service.
 - Admin theme colours are scoped to the restaurant surface and must stay usable for whatever the owner picks.
 - Loyalty/points exists in the API but is not exposed. Its balances are placeholders and must not be surfaced as real.

@@ -16,8 +16,8 @@ export const CHAPTERS = {
     section: 'story',
   },
   flavours: {
-    label: 'Featured dishes',
-    short: 'Featured dishes',
+    label: 'Something sweet',
+    short: 'Something sweet',
     hash: '#flavours',
     section: 'seasonal',
   },

@@ -59,7 +59,7 @@
   text-wrap: balance;
 }
 
-/* Bungee statement, Yellowtail aside: the site's sign-painting pair. */
+/* Condensed display statement, Yellowtail aside. */
 .title em {
   display: inline-block;
   font-family: var(--font-script), cursive;

@@ -118,7 +118,7 @@ function Brand({ reason, hours }: { reason?: Reason; hours: OpenState | null }) 
         BIG FLAVOUR. <em>Bali soul.</em>
       </h1>
       <p className={styles.details}>
-        {hours?.open === false ? 'Find us at T.29, Esk Eats' : 'Order at the counter, T.29'}
+        {hours?.open === false ? 'Find us at Esk Eats' : 'Order at the counter'}
         {hours && <span>{hours.label}</span>}
       </p>
       {hint && <p className={styles.hint}>{hint}</p>}
