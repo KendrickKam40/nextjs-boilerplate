@@ -30,6 +30,7 @@ export const COMMERCE_DESTINATIONS = {
 
 const historyKey = '__balibuCommerceDialog';
 
+/** Full-screen sheet that opens the online ordering or booking site in place. `mode: null` keeps it closed. */
 export default function CommerceDialog({ mode, onClose, openNow }: CommerceDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -162,7 +163,7 @@ export default function CommerceDialog({ mode, onClose, openNow }: CommerceDialo
 
           <div className={styles.serviceBar}>
             <span className={styles.serviceInfo}>
-              <span>T.29, Esk Eats · Invercargill Central</span>
+              <span>Esk Eats · Invercargill Central</span>
               <OpenChip state={openNow ?? null} />
             </span>
             <a href={destination.url} target="_blank" rel="noopener noreferrer">

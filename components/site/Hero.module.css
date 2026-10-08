@@ -1,111 +1,123 @@
-/* First viewport: one word across the red field, painted over the plate.
-   Back to front: painted disc, plate, letters, script. Everything is sized
-   from the hero itself, so the composition holds at any window shape. */
+/* First viewport: one dish at a time between two tall words, each on its own
+   colour field. Sized from the hero itself (container units), so the
+   composition holds at any window shape. */
 .hero {
-  --cy: 45%; /* the composition's centre line, a touch above middle */
-  --plate: min(36cqw, 64cqh, 900px);
+  --ink-on: var(--b-on-accent);
   position: relative;
-  height: clamp(560px, calc(100svh - var(--b-bar)), 62vw);
+  height: clamp(580px, calc(100svh - var(--b-bar)), 62vw);
   overflow: hidden;
   background: var(--b-accent);
-  color: var(--b-on-accent);
+  color: var(--ink-on);
   container-type: size;
   isolation: isolate;
+  transition: background-color 1.2s cubic-bezier(0.22, 1, 0.36, 1), color 1.2s ease;
+}
+.hero[data-tone='green'] {
+  background: var(--b-ink);
+  --ink-on: var(--b-paper);
+}
+.hero[data-tone='gold'] {
+  background: var(--b-gold);
+  --ink-on: var(--b-ink);
 }
 
-/* A pandan disc with a gold pinstripe: the plate's painted backdrop. */
-.disc {
+/* The next dish, out of focus at the top-right edge. */
+.peek {
   position: absolute;
   z-index: 0;
-  left: 50%;
-  top: var(--cy);
-  width: calc(var(--plate) * 1.14);
+  right: -11cqw;
+  top: -10cqh;
+  width: min(30cqw, 52cqh);
   aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background: var(--b-ink);
-  outline: 3px solid var(--b-gold);
-  outline-offset: -16px;
-}
-
-.title {
-  /* Its centring translate makes a stacking context, so it carries the layer. */
-  position: absolute;
-  z-index: 3;
-  left: 50%;
-  top: var(--cy);
-  width: max-content;
-  translate: -50% -50%;
-  font-size: min(16.6cqw, 36cqh);
-  text-align: left;
-}
-.hero .title {
-  color: var(--b-on-accent);
-}
-.word,
-.big {
-  /* A sign-writer's pandan outline keeps cream letters legible over the food. */
-  -webkit-text-stroke: 0.035em var(--b-ink);
-  paint-order: stroke fill;
-}
-.word {
-  position: relative;
-  z-index: 3;
-  display: block;
-  line-height: 0.86;
-  white-space: nowrap;
-}
-/* "BIG" sits on FLAVOUR's left shoulder. */
-.big {
-  position: absolute;
-  z-index: 3;
-  left: 0.04em;
-  bottom: 100%;
-  margin-bottom: 0.06em;
-  font-size: 0.34em;
-  line-height: 0.86;
-}
-/* Painted across the foot of the plate, in front of everything. */
-.soul {
-  position: absolute;
-  z-index: 4;
-  right: 6%;
-  top: 70%;
-  font-size: 0.44em;
-  line-height: 1;
-  color: var(--b-gold);
-  rotate: -8deg;
-  white-space: nowrap;
-}
-
-.plate {
-  position: absolute;
-  z-index: 2;
-  left: calc(50% - var(--plate) / 2);
-  top: calc(var(--cy) - var(--plate) / 2);
-  width: var(--plate);
-  aspect-ratio: 1;
-  filter: drop-shadow(0 28px 26px #0006);
+  filter: blur(14px);
+  opacity: 0.85;
   pointer-events: none;
 }
-.plateInner {
-  width: 100%;
-  height: 100%;
+.peekInner,
+.dishInner {
+  position: absolute;
+  inset: 0;
 }
-.plate img {
+.peek img,
+.dish img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
   user-select: none;
+  pointer-events: none;
 }
 
-/* Corners: the offer bottom-left, where to find it bottom-right. */
-.lead,
-.where {
+.stage {
+  /* Each slide's words are sized so its widest word exactly fills its side
+     of the dish (--em is that word's width at 1em). */
+  /* Words and dish sit side by side with a small gap, so every letter reads.
+     A negative overlap is that gap. */
+  --dish: min(28cqw, 62cqh, 700px);
+  --overlap: calc(-1.4cqw);
+  --col: calc((100cqw - 2 * var(--b-gutter) - var(--dish)) / 2 + var(--overlap));
+  --size: min(calc(var(--col) / var(--em, 3.4) * 0.97), 30cqh);
   position: absolute;
-  z-index: 4;
-  bottom: clamp(20px, 4cqh, 44px);
+  z-index: 1;
+  left: var(--b-gutter);
+  right: var(--b-gutter);
+  top: 47%;
+  translate: 0 -50%;
+}
+.kicker {
+  margin-bottom: 0.2em;
+  padding-left: 0.05em;
+  font-family: var(--b-sign);
+  font-size: calc(var(--size) * 0.3);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+.word {
+  position: relative;
+  z-index: 3;
+  font-family: var(--b-sign);
+  font-size: var(--size);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+.left {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+}
+.right {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: start;
+}
+/* The dish sits between the words, clear of every letter. */
+.dish {
+  position: relative;
+  z-index: 2;
+  grid-column: 2;
+  grid-row: 1;
+  width: var(--dish);
+  aspect-ratio: 1;
+  margin-inline: calc(var(--overlap) * -1);
+  filter: drop-shadow(0 28px 26px #0005);
+}
+
+.lead,
+.side {
+  position: absolute;
+  z-index: 3;
+  /* Clears the tilted band that crosses the seam below. */
+  bottom: clamp(64px, 9cqh, 96px);
 }
 .lead {
   left: var(--b-gutter);
@@ -113,19 +125,76 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 18px;
-  max-width: min(26rem, 25cqw);
+  max-width: min(25rem, 26cqw);
 }
-.line {
-  font-size: clamp(15px, 1.25vw, 19px);
+.copy {
+  font-size: clamp(15px, 1.2vw, 18px);
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.45;
 }
-.where {
+.side {
   right: var(--b-gutter);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: 14px;
+}
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.dot,
+.pause {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.dot {
+  width: 48px;
+  height: 44px;
+  padding: 0 4px;
+}
+.dot::before {
+  content: '';
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: currentColor;
+  opacity: 0.3;
+}
+.fill {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.dot[aria-current='true'] .fill {
+  animation: progress linear forwards;
+}
+.pause {
+  width: 44px;
+  height: 44px;
+  margin-left: 4px;
+}
+.pause svg {
+  box-sizing: content-box;
+  padding: 9px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.where {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
   text-align: right;
 }
 .place {
@@ -138,48 +207,76 @@
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
-  text-decoration-color: var(--b-gold);
+}
+@keyframes progress {
+  to { transform: scaleX(1); }
 }
 
-/* Tablets and phones: the same idea stacked. The word runs across the top,
-   the plate overlaps its lower half, the offer follows underneath. */
+/* The cream pill disappears into the gold field; give it ink there. */
+.hero[data-tone='gold'] .order {
+  border-color: var(--b-ink);
+  background: var(--b-ink);
+  color: var(--b-paper);
+}
+
+/* Tablets and phones: the words sit on one line above the dish. */
 @media (max-width: 900px) {
   .hero {
     display: flex;
     flex-direction: column;
     height: auto;
-    padding: clamp(56px, 12cqw, 96px) var(--b-gutter) 40px;
+    padding: clamp(36px, 8cqw, 64px) var(--b-gutter) 64px;
     container-type: inline-size;
   }
-  .disc { display: none; }
-  .title {
+  .peek { display: none; }
+  .stage {
+    --size: 20cqw;
     position: relative;
     left: auto;
+    right: auto;
     top: auto;
     translate: none;
-    align-self: center;
-    font-size: 16.4cqw;
+    text-align: center;
   }
-  .plate {
-    position: relative;
-    left: auto;
-    top: auto;
-    align-self: center;
-    width: min(78cqw, 560px);
-    margin-top: -6cqw;
+  .kicker { margin-bottom: calc(var(--size) * 0.12); font-size: max(16px, calc(var(--size) * 0.26)); }
+  .line {
+    grid-template-columns: auto auto;
+    justify-content: center;
+    column-gap: 0.12em;
+    font-size: var(--size);
+  }
+  .left { grid-column: 1; grid-row: 1; }
+  .right { grid-column: 2; grid-row: 1; }
+  .dish {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+    width: min(76cqw, 520px);
+    margin: -4cqw 0 0;
   }
   .lead,
-  .where {
+  .side {
     position: static;
   }
-  .lead { max-width: 34rem; margin-top: 8px; }
-  .where { align-items: flex-start; margin-top: 18px; text-align: left; }
-  .line { font-size: 15px; line-height: 1.45; }
+  .lead { max-width: 34rem; margin-top: 20px; }
+  .copy { font-size: 15px; }
+  .side {
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin-top: 20px;
+  }
+  .where { align-items: flex-start; text-align: left; }
 }
 @media (max-width: 700px) {
-  .hero { padding-bottom: 44px; }
-  .line { font-size: 14px; max-width: 34ch; }
+  .stage { --size: 18.5cqw; }
   .lead .order { display: none; }
-  .big { font-size: 0.44em; }
-  .soul { font-size: 0.56em; top: 74%; }
+  .copy { font-size: 14px; max-width: 34ch; }
+  .lead { margin-top: 14px; }
+  .side { margin-top: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero { transition: none; }
 }

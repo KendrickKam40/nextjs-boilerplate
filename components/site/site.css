@@ -53,9 +53,10 @@
 .balibu-site :where(main) h2 {
   text-wrap: balance;
   font-family: var(--b-sign);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 0.92;
+  font-weight: 900;
+  letter-spacing: -0.005em;
+  line-height: 0.86;
+  text-transform: uppercase;
   color: var(--b-heading);
 }
 .balibu-site svg {
@@ -71,29 +72,6 @@
   color: var(--b-ink);
 }
 
-/* Painted lettering: a hard sign-writer's shadow, only ever on display type. */
-.b-painted {
-  text-shadow: 0.045em 0.05em 0 var(--b-shadow, var(--b-gold));
-}
-.b-script {
-  font-family: var(--b-script);
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-}
-/* Script laid over other lettering gets the sign-writer's outline. */
-.b-script--outlined {
-  -webkit-text-stroke: 0.09em var(--b-ink);
-  paint-order: stroke fill;
-  text-shadow: 0.04em 0.05em 0 var(--b-ink);
-}
-/* A cart panel: thick border with a pinstripe painted just inside it. */
-.b-panel {
-  border: 3px solid var(--b-ink);
-  border-radius: 28px;
-  outline: 2px solid var(--b-ink);
-  outline-offset: -11px;
-}
 
 /* Pill buttons, like painted enamel plates. */
 .b-pill {
@@ -105,9 +83,9 @@
   padding: 0 26px;
   border: 2px solid currentColor;
   border-radius: 999px;
-  font-family: var(--b-sign);
+  font-family: var(--font-body), Arial, sans-serif;
   font-size: 15px;
-  letter-spacing: 0.02em;
+  font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
@@ -124,12 +102,12 @@
     transform: translate(2px, -2px);
   }
 }
-/* The site's button reset would otherwise put Manrope back on pills. */
+/* Beats the site's button reset. */
 .balibu-site .b-pill {
   font: inherit;
-  font-family: var(--b-sign);
+  font-family: var(--font-body), Arial, sans-serif;
   font-size: 15px;
-  letter-spacing: 0.02em;
+  font-weight: 700;
   line-height: 1;
 }
 .b-pill:active {

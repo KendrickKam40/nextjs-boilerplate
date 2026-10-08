@@ -10,11 +10,12 @@ import { BALIBU_LOCATION } from '@/lib/site-location';
 import { themeVariables } from '@/lib/site-theme';
 import BrandLogo from './BrandLogo';
 import CommerceDialog, { COMMERCE_DESTINATIONS } from './CommerceDialog';
-import FeatureSection from './FeatureSection';
+import GiantWord from './GiantWord';
 import Hero from './Hero';
 import MenuSection from './MenuSection';
 import OpenChip from './OpenChip';
 import StorySection from './StorySection';
+import SweetSection from './SweetSection';
 import Ticker from './Ticker';
 import VisitScene from './VisitScene';
 import { useOpenState } from './useOpenState';
@@ -28,11 +29,12 @@ const SAME_TAB_QUERY = '(max-width: 700px)';
 
 const NAV_LABELS: Record<ChapterId, string> = {
   menu: 'Menu',
-  flavours: 'Featured',
+  flavours: 'Sweets',
   story: 'Our story',
   visit: 'Visit',
 };
 
+/** The whole Balibu homepage: sticky bar, hero, ticker, menu, story, sweets and visit, wired to live POS data from /api/client. */
 export default function RestaurantSite() {
   const { data, status, layout } = useRestaurant();
   const openNow = useOpenState(data?.client, status === 'live');
@@ -85,11 +87,17 @@ export default function RestaurantSite() {
 
         <main id="main-content" tabIndex={-1} className={styles.main}>
           <Hero openNow={openNow} onOrder={onOrder} />
-          <Ticker />
+          <Ticker
+            tone="gold"
+            tilt
+            words={[openNow?.label ?? 'Open 10 am – 9 pm', 'Esk Eats, Invercargill']}
+            label={openNow?.label ?? 'Open every day, 10 am to 9 pm, at Esk Eats, Invercargill Central.'}
+          />
+          <GiantWord />
           {sections.map((id) => (
             <div key={id} className={styles.section}>
               {id === 'menu' && <MenuSection data={data} onOrder={onOrder} />}
-              {id === 'flavours' && <FeatureSection menuItems={data?.menuItems} onOrder={onOrder} />}
+              {id === 'flavours' && <SweetSection data={data} onOrder={onOrder} />}
               {id === 'story' && <StorySection client={data?.client} onOrder={onOrder} />}
               {id === 'visit' && (
                 <VisitScene client={data?.client} onBooking={onBooking} onOrder={onOrder} openNow={openNow} />
@@ -101,14 +109,7 @@ export default function RestaurantSite() {
         <footer className={styles.footer}>
           <Ticker />
           <div className={styles.footerBody}>
-            <p className={`${styles.footerSign} b-painted`}>
-              SEE YOU AT <span>T.29</span>
-            </p>
-            <p className={`${styles.footerScript} b-script`}>Esk Eats, Invercargill Central</p>
             <div className={styles.footerRow}>
-              <button type="button" className="b-pill b-pill--gold" onClick={onOrder}>
-                Order online <ArrowUpRight size={18} strokeWidth={2.4} aria-hidden="true" />
-              </button>
               <a className={styles.footerLink} href={BALIBU_LOCATION.phoneHref}>
                 <Phone size={18} aria-hidden="true" /> {BALIBU_LOCATION.phone}
               </a>
