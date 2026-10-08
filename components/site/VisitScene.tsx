@@ -7,6 +7,7 @@ import { BALIBU_LOCATION } from '@/lib/site-location';
 import OpenChip from './OpenChip';
 import styles from './VisitScene.module.css';
 
+/** Where and when: address, opening hours, phone, map link and order/booking buttons. */
 export default function VisitScene({
   client,
   onBooking,

@@ -30,6 +30,7 @@ export const COMMERCE_DESTINATIONS = {
 
 const historyKey = '__balibuCommerceDialog';
 
+/** Full-screen sheet that opens the online ordering or booking site in place. `mode: null` keeps it closed. */
 export default function CommerceDialog({ mode, onClose, openNow }: CommerceDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);

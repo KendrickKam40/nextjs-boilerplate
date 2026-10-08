@@ -126,6 +126,7 @@ function Brand({ reason, hours }: { reason?: Reason; hours: OpenState | null }) 
   );
 }
 
+/** Full-screen in-store TV: plays the staff playlist from /api/display and recovers on its own when a video fails. */
 export default function StoreDisplay({
   initial,
   themeStyle,

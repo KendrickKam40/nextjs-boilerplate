@@ -57,6 +57,7 @@ function liveCollections(data: RestaurantData | null): Collection[] {
 const TONES = ['red', 'gold', 'cream'] as const;
 const LIVE_PREVIEW = 4;
 
+/** The menu as a horizontal rail of painted cards, one per collection; shows live POS items and prices when `data` has them. */
 export default function MenuSection({
   data,
   onOrder,

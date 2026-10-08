@@ -44,6 +44,7 @@ const SLIDES = [
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/** First viewport: a slow dish slideshow between two tall sign-painted words, on red, green and gold fields. */
 export default function Hero({
   openNow = null,
   onOrder,

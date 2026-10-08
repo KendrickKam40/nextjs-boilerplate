@@ -1,0 +1,75 @@
+{
+  "projectId": "df2a6f00-c49c-4355-9652-1ee2b40fa795",
+  "shape": "package",
+  "pkg": "@balibu/design-system",
+  "globalName": "Balibu",
+  "buildCmd": "node design-system/build.mjs",
+  "entry": "./design-system/dist/index.js",
+  "srcDir": "../components",
+  "tsconfig": "./tsconfig.json",
+  "cssEntry": "dist/index.css",
+  "extraFonts": [
+    "fonts.css"
+  ],
+  "dtsPropsFor": {
+    "Hero": "/** Live open/closed state; null hides the chip. */ openNow?: { open: boolean; label: string } | null; onOrder: () => void;",
+    "OpenChip": "/** null renders nothing (state not known yet). */ state: { open: boolean; label: string } | null; className?: string;",
+    "CommerceDialog": "/** Which site to open in the sheet; null keeps it closed. */ mode: 'order' | 'booking' | null; onClose: () => void; openNow?: { open: boolean; label: string } | null;",
+    "VisitScene": "/** POS client record; omitted fields fall back to Balibu's real address, hours and phone. */ client?: { aboutUs?: string; appDescription?: string; address?: string; companyNumber?: string; openTimes?: Record<string, string>; openStatus?: number; bookingAccess?: boolean }; onBooking?: () => void; onOrder: () => void; openNow?: { open: boolean; label: string } | null;",
+    "StorySection": "/** POS client record; aboutUs replaces the default story when set. */ client?: { aboutUs?: string; appDescription?: string; address?: string; companyNumber?: string; openTimes?: Record<string, string>; openStatus?: number; bookingAccess?: boolean }; onOrder: () => void;",
+    "MenuSection": "/** Live POS data; null shows the editorial collections without prices. */ data: { client: { aboutUs?: string; appDescription?: string; address?: string; companyNumber?: string; openTimes?: Record<string, string>; openStatus?: number; bookingAccess?: boolean }; menuItems: { id: string; name: string; description?: string; price: number; category?: string | number; image?: string; soldOut?: number }[]; categories: { id?: string | number; name: string; visible?: boolean }[] } | null; onOrder: () => void;",
+    "SweetSection": "/** Live POS data; null shows the default treats. */ data: { client: { aboutUs?: string; appDescription?: string; address?: string; companyNumber?: string; openTimes?: Record<string, string>; openStatus?: number; bookingAccess?: boolean }; menuItems: { id: string; name: string; description?: string; price: number; category?: string | number; image?: string; soldOut?: number }[]; categories: { id?: string | number; name: string; visible?: boolean }[] } | null; onOrder: () => void;",
+    "StoreDisplay": "/** YouTube video ids to loop, and the playlist state. */ initial: { ids: string[]; status: 'ok' | 'empty' | 'unplayable' | 'unavailable' }; themeStyle?: React.CSSProperties;",
+    "SiteFrame": "/** Owner colour overrides, same keys as /admin. */ theme?: { backgroundColor?: string; textColor?: string; headingPrimaryColor?: string; primaryColor?: string; secondaryColor?: string }; children?: React.ReactNode; style?: React.CSSProperties;"
+  },
+  "provider": {
+    "component": "SiteFrame"
+  },
+  "overrides": {
+    "Hero": {
+      "cardMode": "column",
+      "viewport": "1280x800"
+    },
+    "MenuSection": {
+      "cardMode": "column",
+      "viewport": "1280x1300"
+    },
+    "GiantWord": {
+      "cardMode": "column",
+      "viewport": "1280x800"
+    },
+    "StorySection": {
+      "cardMode": "column",
+      "viewport": "1280x800"
+    },
+    "SweetSection": {
+      "cardMode": "column",
+      "viewport": "1280x1200"
+    },
+    "VisitScene": {
+      "cardMode": "column",
+      "viewport": "1280x800"
+    },
+    "Ticker": {
+      "cardMode": "column",
+      "viewport": "1280x400"
+    },
+    "RestaurantSite": {
+      "cardMode": "single",
+      "viewport": "1280x900"
+    },
+    "StoreDisplay": {
+      "cardMode": "single",
+      "viewport": "1280x720"
+    },
+    "CommerceDialog": {
+      "cardMode": "single",
+      "viewport": "1280x800"
+    },
+    "SiteFrame": {
+      "cardMode": "column",
+      "viewport": "1100x500"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}

@@ -48,3 +48,11 @@ next-env.d.ts
 /.impeccable/live/
 /.next-admin-test/
 /.next-redesign/
+
+# design-sync (Claude Design) build state
+.ds-sync/
+ds-bundle/
+design-system/dist/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules

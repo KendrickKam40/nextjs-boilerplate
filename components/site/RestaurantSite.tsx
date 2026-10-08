@@ -34,6 +34,7 @@ const NAV_LABELS: Record<ChapterId, string> = {
   visit: 'Visit',
 };
 
+/** The whole Balibu homepage: sticky bar, hero, ticker, menu, story, sweets and visit, wired to live POS data from /api/client. */
 export default function RestaurantSite() {
   const { data, status, layout } = useRestaurant();
   const openNow = useOpenState(data?.client, status === 'live');

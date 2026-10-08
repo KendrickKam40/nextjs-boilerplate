@@ -5,6 +5,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { BRAND_STORY, type RestaurantClient } from '@/lib/site-content';
 import styles from './StorySection.module.css';
 
+/** The Balibu story beside a photo of the counter, with an order button. */
 export default function StorySection({ client, onOrder }: {
   client?: RestaurantClient;
   onOrder: () => void;
