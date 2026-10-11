@@ -133,3 +133,38 @@ export function collectionFor(name: string): MenuCollection {
   if (/rendang|beef|chicken|indonesia/.test(key)) return byName('Indonesian favourites');
   return OTHER_COLLECTION;
 }
+
+export interface Dish {
+  name: string;
+  /** One plain line on what's in it. Draft copy from the photos; owner to confirm. */
+  line: string;
+  image: { src: string; width: number; height: number };
+  /** Degrees the cutout leans on its tile. */
+  tilt: number;
+  /** Takes two grid columns. */
+  wide?: boolean;
+}
+
+// Homepage dish tiles. Every tile opens online ordering; no prices here.
+export const SAVOURY_DISHES: Dish[] = [
+  { name: 'Nasi goreng', line: 'Wok-fried rice with chicken, a fried egg and sambal.', image: FOOD_IMAGES.floatingDish, tilt: -6 },
+  { name: 'Mie goreng', line: 'Fried egg noodles with chicken, bok choy and a fried egg.', image: FOOD_IMAGES.floatingMieGoreng, tilt: 5 },
+  { name: 'Chicken rendang', line: 'Chicken slow-cooked in coconut and spices, with rice.', image: FOOD_IMAGES.floatingRendang, tilt: -4 },
+  { name: 'Bakso', line: 'Beef meatball soup with noodles and bok choy.', image: FOOD_IMAGES.floatingBakso, tilt: 6 },
+  { name: 'Chicken satay', line: 'Grilled chicken skewers with peanut sauce.', image: FOOD_IMAGES.floatingSatay, tilt: -5 },
+  { name: 'Crispy smashed chicken', line: 'Fried chicken, smashed flat, with sambal and rice.', image: FOOD_IMAGES.floatingSmashedChicken, tilt: 4 },
+];
+
+export const SWEET_DISHES: Dish[] = [
+  { name: 'Milkshakes', line: 'Thick and cold, with cream on top.', image: FOOD_IMAGES.floatingMilkshake, tilt: -5 },
+  { name: 'Smoothies', line: 'Blended fruit, whipped cream on top.', image: FOOD_IMAGES.cupSmoothie, tilt: 4 },
+  { name: 'Slushies', line: 'Icy, bright and very cold.', image: FOOD_IMAGES.cupSlushie, tilt: -4 },
+  { name: 'Dirty soda', line: 'Cola, cream and a squeeze of lime.', image: FOOD_IMAGES.cupDirtySoda, tilt: 5 },
+  {
+    name: 'Soft serve & the Fully Loaded Sundae',
+    line: 'Soft serve, chocolate sauce, sprinkles and biscuits.',
+    image: FOOD_IMAGES.floatingSundae,
+    tilt: -3,
+    wide: true,
+  },
+];

@@ -11,6 +11,17 @@ export const THEME_BASE = {
 } as const;
 
 export type EditableThemeKey = keyof typeof THEME_BASE;
+export type ThemePalette = Record<EditableThemeKey, string>;
+
+/** The homepage's warung-signboard palette: terracotta, turmeric and cocoa on
+ *  warm cream. Owner colours from /admin still take precedence. */
+export const HOME_THEME: ThemePalette = {
+  backgroundColor: '#f3e6cf',
+  textColor: '#3a2418',
+  headingPrimaryColor: '#3a2418',
+  primaryColor: '#a8492c',
+  secondaryColor: '#e2b04a',
+};
 
 const ON_ACCENT = '#fff3df';
 const DARK = '#191a17';
@@ -24,12 +35,12 @@ export const THEME_FIELDS: {
   {
     key: 'backgroundColor',
     label: 'Page background',
-    description: 'The cream behind the story section and the colour of most big lettering. Keep it light.',
+    description: 'The cream header, dish cards and story section, and the border painted inside each sign. Keep it light.',
   },
   {
     key: 'textColor',
     label: 'Text and dark panels',
-    description: 'The green menu section and footer, and body text on light backgrounds.',
+    description: 'Body text, the painted signs behind the big headings, and the footer.',
   },
   {
     key: 'headingPrimaryColor',
@@ -39,12 +50,12 @@ export const THEME_FIELDS: {
   {
     key: 'primaryColor',
     label: 'Accent',
-    description: 'The red hero slide, Visit section, top bar and big “NASI GORENG” lettering.',
+    description: 'The hero, the savoury dishes and the Visit section.',
   },
   {
     key: 'secondaryColor',
     label: 'Highlight',
-    description: 'The yellow Something sweet section, the ticker bands and the third hero slide.',
+    description: 'The sweets section, the hours strip, ticker bands and the lettering on the signs.',
   },
 ];
 
@@ -88,8 +99,9 @@ export interface ThemeCheck {
   problem?: string;
 }
 
-/** Resolves overrides the way the public site does, explaining any rejection. */
-export function resolveTheme(overrides?: Partial<Record<string, string>>) {
+/** Resolves overrides the way the public site does, explaining any rejection.
+ *  `base` is the surface's own palette; rejected or missing colours fall back to it. */
+export function resolveTheme(overrides?: Partial<Record<string, string>>, base: ThemePalette = THEME_BASE) {
   const checks = {} as Record<EditableThemeKey, ThemeCheck>;
   const pick = (
     key: EditableThemeKey,
@@ -120,23 +132,29 @@ export function resolveTheme(overrides?: Partial<Record<string, string>>) {
   const need = (color: string, againstColor: string, needed: number, against: string) =>
     contrast(color, againstColor) < needed ? { against, againstColor } : null;
 
-  const paper = pick('backgroundColor', THEME_BASE.backgroundColor, (c) =>
+  const paper = pick('backgroundColor', base.backgroundColor, (c) =>
     need(c, DARK, 10, 'dark text'),
   );
-  const inkFallback = contrast(THEME_BASE.textColor, paper) >= 7 ? THEME_BASE.textColor : DARK;
+  const inkFallback = contrast(base.textColor, paper) >= 7 ? base.textColor : DARK;
   const ink = pick('textColor', inkFallback, (c) => need(c, paper, 7, 'the page background'));
-  const heading = pick('headingPrimaryColor', ink, (c) => need(c, paper, 4.5, 'the page background'));
-  const accent = pick('primaryColor', THEME_BASE.primaryColor, (c) =>
+  // Headings follow the text colour unless the palette gives them their own.
+  const headingFallback =
+    base.headingPrimaryColor !== base.textColor && contrast(base.headingPrimaryColor, paper) >= 4.5
+      ? base.headingPrimaryColor
+      : ink;
+  const heading = pick('headingPrimaryColor', headingFallback, (c) => need(c, paper, 4.5, 'the page background'));
+  const accent = pick('primaryColor', base.primaryColor, (c) =>
     need(c, paper, 3, 'the page background'),
   );
-  const highlight = pick('secondaryColor', THEME_BASE.secondaryColor, (c) =>
+  const highlight = pick('secondaryColor', base.secondaryColor, (c) =>
     need(c, ink, 4.5, 'the dark panels'),
   );
 
   const vars: Record<string, string> = {};
   if (paper !== THEME_BASE.backgroundColor) vars['--b-paper'] = paper;
   if (ink !== THEME_BASE.textColor) vars['--b-ink'] = ink;
-  if (checks.headingPrimaryColor.custom && checks.headingPrimaryColor.applied) vars['--b-heading'] = heading;
+  // site.css defaults --b-heading to --b-ink, so only a distinct heading colour needs a variable.
+  if (heading !== ink) vars['--b-heading'] = heading;
   if (accent !== THEME_BASE.primaryColor) {
     vars['--b-accent'] = accent;
     vars['--b-on-accent'] = best(accent, [ON_ACCENT, '#ffffff', DARK]);
@@ -147,6 +165,6 @@ export function resolveTheme(overrides?: Partial<Record<string, string>>) {
 }
 
 /** CSS variables for the restaurant surface from owner theme overrides. */
-export function themeVariables(overrides?: Partial<Record<string, string>>) {
-  return resolveTheme(overrides).vars;
+export function themeVariables(overrides?: Partial<Record<string, string>>, base?: ThemePalette) {
+  return resolveTheme(overrides, base).vars;
 }

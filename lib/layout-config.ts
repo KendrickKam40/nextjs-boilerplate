@@ -37,17 +37,17 @@ export const LAYOUT_SECTIONS: Record<PageKey, LayoutSection[]> = {
     {
       id: 'categories',
       label: 'The menu',
-      description: 'Menu sections, with live items and prices from the POS.',
+      description: 'The savoury dishes. Each tile opens online ordering.',
+    },
+    {
+      id: 'seasonal',
+      label: 'Something sweet',
+      description: 'Milkshakes, smoothies, slushies, dirty soda and the sundae. Each tile opens online ordering.',
     },
     {
       id: 'story',
       label: 'About Balibu',
       description: 'Balibu’s story beside the photo of the counter.',
-    },
-    {
-      id: 'seasonal',
-      label: 'Something sweet',
-      description: 'Milkshakes, smoothies, slushies and sundaes, with live sweet prices from the POS.',
     },
     {
       id: 'contact',

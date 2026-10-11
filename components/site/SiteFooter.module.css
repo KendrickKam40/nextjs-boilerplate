@@ -1,0 +1,62 @@
+.footer {
+  background: var(--b-ink);
+  color: var(--b-on-ink);
+}
+/* Woven band: turmeric and terracotta triangles over a turmeric rule. */
+.stripe {
+  height: 32px;
+  background:
+    linear-gradient(transparent 0 26px, var(--b-gold) 26px 29px, transparent 29px),
+    url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2220%22%3E%3Cpath%20d%3D%22M0%2020%2012%202%2024%2020Z%22%20fill%3D%22%23e2b04a%22%2F%3E%3Cpath%20d%3D%22M6%2020%2012%2010%2018%2020Z%22%20fill%3D%22%23a8492c%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2215.5%22%20r%3D%221.4%22%20fill%3D%22%231d5a35%22%2F%3E%3C%2Fsvg%3E') 0 6px / 24px 20px repeat-x,
+    var(--b-ink);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 40px;
+  padding: 40px var(--b-gutter) 48px;
+}
+.logo {
+  width: 84px;
+}
+.where {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 52ch;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.address {
+  font-weight: 700;
+}
+.hours {
+  color: var(--b-on-ink-muted);
+}
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+.phone {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  font-size: 17px;
+  font-weight: 700;
+}
+@media (hover: hover) {
+  .phone:hover {
+    color: var(--b-gold);
+  }
+}
+/* Room for the fixed bottom bar on phones. */
+@media (max-width: 700px) {
+  .row {
+    padding-bottom: calc(48px + 88px + env(safe-area-inset-bottom));
+  }
+}

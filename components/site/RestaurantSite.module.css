@@ -1,7 +1,10 @@
 .site {
   min-height: 100svh;
-  /* The tilted ticker overhangs both edges; clip without breaking sticky. */
   overflow-x: clip;
+}
+/* Overscroll past the footer shows cocoa, not white. */
+:global(body):has(.site) {
+  background: #3a2418;
 }
 .announcement {
   padding: 10px var(--b-gutter);
@@ -11,150 +14,30 @@
   font-weight: 700;
   text-align: center;
 }
-
-/* The sign bar: painted onto the red field, then solid once you scroll past. */
-.bar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 3vw, 40px);
-  height: var(--b-bar);
-  padding: 0 var(--b-gutter);
-  padding-top: env(safe-area-inset-top);
-  background: var(--b-accent);
-  color: var(--b-on-accent);
-  border-bottom: 2px solid color-mix(in srgb, var(--b-on-accent) 22%, transparent);
-}
-.brand {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--b-paper);
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-@media (hover: hover) {
-  .brand:hover { transform: rotate(-8deg); }
-}
-.logo {
-  width: 46px;
-}
-.nav {
-  display: flex;
-  gap: clamp(14px, 2.4vw, 34px);
-  margin-left: auto;
-}
-.nav a {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  font-family: var(--b-sign);
-  font-size: 19px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  font-weight: 800;
-}
-.nav a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 8px;
-  height: 3px;
-  border-radius: 3px;
-  background: var(--b-gold);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-@media (hover: hover) {
-  .nav a:hover::after { transform: scaleX(1); }
-}
-.barOrder {
-  min-height: 46px;
-  padding: 0 20px;
-  font-size: 13px;
-}
-
-.main {
-  outline: none;
-}
-.section > * {
-  scroll-margin-top: var(--b-bar);
-}
-
-.footer {
-  background: var(--b-ink);
-  color: var(--b-on-ink);
-}
-.footerBody {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 22px;
-  padding: clamp(36px, 4vw, 56px) var(--b-gutter) clamp(36px, 4vw, 56px);
-}
-.footerRow {
+/* Today's hours under the header, with a quick way to order. */
+.strip {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 18px 28px;
+  justify-content: center;
+  gap: 4px 10px;
+  padding: 12px var(--b-gutter);
+  background: var(--b-gold);
+  color: var(--b-ink);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
 }
-.footerLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  font-size: 17px;
-  font-weight: 700;
+.site .strip button {
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--b-ink);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
 }
-@media (hover: hover) {
-  .footerLink:hover { color: var(--b-gold); }
-}
-.footerOpen {
-  color: var(--b-on-ink);
-}
-.small {
-  max-width: 70ch;
-  color: var(--b-on-ink-muted);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.mobileOrder {
-  display: none;
-}
-@media (max-width: 900px) {
-  .nav { display: none; }
-  .barOrder { margin-left: auto; }
-}
-@media (max-width: 700px) {
-  .site { --b-bar: 64px; }
-  .brand { width: 48px; height: 48px; }
-  .logo { width: 40px; }
-  .bar .barOrder { display: none; }
-  /* Room for the fixed Order bar, only where it exists. */
-  .footerBody { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-  .mobileOrder {
-    position: fixed;
-    z-index: 45;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: block;
-    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-    background: linear-gradient(transparent, color-mix(in srgb, var(--b-ink) 55%, transparent));
-    pointer-events: none;
-  }
-  .mobileOrder button {
-    width: 100%;
-    min-height: 56px;
-    pointer-events: auto;
-    box-shadow: 0 10px 24px #0004;
-  }
+.main {
+  outline: none;
 }

@@ -1,21 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
-import { ArrowUpRight, Phone } from 'lucide-react';
 import { DEFAULT_LAYOUTS } from '@/lib/layout-config';
 import { CHAPTERS, type ChapterId } from '@/lib/site-navigation';
-import type { CommerceMode } from '@/lib/site-content';
-import { BALIBU_LOCATION } from '@/lib/site-location';
-import { themeVariables } from '@/lib/site-theme';
-import BrandLogo from './BrandLogo';
+import { SAVOURY_DISHES, SWEET_DISHES, type CommerceMode } from '@/lib/site-content';
+import { HOME_THEME, themeVariables } from '@/lib/site-theme';
 import CommerceDialog, { COMMERCE_DESTINATIONS } from './CommerceDialog';
-import GiantWord from './GiantWord';
-import Hero from './Hero';
-import MenuSection from './MenuSection';
-import OpenChip from './OpenChip';
+import DishSection from './DishSection';
+import MobileBar from './MobileBar';
+import SignboardHero from './SignboardHero';
+import SiteFooter from './SiteFooter';
+import SiteHeader from './SiteHeader';
 import StorySection from './StorySection';
-import SweetSection from './SweetSection';
 import Ticker from './Ticker';
 import VisitScene from './VisitScene';
 import { useOpenState } from './useOpenState';
@@ -27,14 +24,9 @@ import './site.css';
 // instead of a full-screen iframe that cannot report its own errors.
 const SAME_TAB_QUERY = '(max-width: 700px)';
 
-const NAV_LABELS: Record<ChapterId, string> = {
-  menu: 'Menu',
-  flavours: 'Sweets',
-  story: 'Our story',
-  visit: 'Visit',
-};
+const SWEET_WORDS = ['Milkshakes', 'Smoothies', 'Slushies', 'Dirty soda', 'Soft serve', 'Fully Loaded Sundae'];
 
-/** The whole Balibu homepage: sticky bar, hero, ticker, menu, story, sweets and visit, wired to live POS data from /api/client. */
+/** The whole Balibu homepage: signboard hero, dish tiles, story and visit, wired to live POS data from /api/client. */
 export default function RestaurantSite() {
   const { data, status, layout } = useRestaurant();
   const openNow = useOpenState(data?.client, status === 'live');
@@ -61,73 +53,67 @@ export default function RestaurantSite() {
   const announcement = items.some((item) => item.id === 'ticker' && item.enabled)
     ? data?.client.kioskMessage?.trim()
     : undefined;
+  const hoursLabel = openNow?.label ?? 'Open every day, 10 am – 9 pm';
 
   return (
     <MotionConfig reducedMotion="user">
-      <div id="top" className={`balibu-site ${styles.site}`} style={themeVariables(data?.themeOverrides)}>
+      <div id="top" className={`balibu-site ${styles.site}`} style={themeVariables(data?.themeOverrides, HOME_THEME)}>
         <a className="b-skip-link" href="#main-content">
           Skip to content
         </a>
         {announcement && <p className={styles.announcement}>{announcement}</p>}
-        <header className={styles.bar}>
-          <a href="#top" className={styles.brand} aria-label="Balibu, back to top">
-            <BrandLogo className={styles.logo} sizes="64px" priority />
-          </a>
-          <nav aria-label="Sections" className={styles.nav}>
-            {sections.map((id) => (
-              <a key={id} href={CHAPTERS[id].hash}>
-                {NAV_LABELS[id]}
-              </a>
-            ))}
-          </nav>
-          <button type="button" className={`b-pill b-pill--cream ${styles.barOrder}`} onClick={onOrder}>
-            Order online <ArrowUpRight size={18} strokeWidth={2.4} aria-hidden="true" />
+        <SiteHeader sections={sections} openNow={openNow} onOrder={onOrder} />
+        <p className={styles.strip}>
+          {hoursLabel} at Esk Eats, Invercargill.{' '}
+          <button type="button" onClick={onOrder}>
+            Order online ›
           </button>
-        </header>
+        </p>
 
         <main id="main-content" tabIndex={-1} className={styles.main}>
-          <Hero openNow={openNow} onOrder={onOrder} />
-          <Ticker
-            tone="gold"
-            tilt
-            words={[openNow?.label ?? 'Open 10 am – 9 pm', 'Esk Eats, Invercargill']}
-            label={openNow?.label ?? 'Open every day, 10 am to 9 pm, at Esk Eats, Invercargill Central.'}
-          />
-          <GiantWord />
+          <SignboardHero onOrder={onOrder} />
           {sections.map((id) => (
-            <div key={id} className={styles.section}>
-              {id === 'menu' && <MenuSection data={data} onOrder={onOrder} />}
-              {id === 'flavours' && <SweetSection data={data} onOrder={onOrder} />}
+            <Fragment key={id}>
+              {id === 'menu' && (
+                <DishSection
+                  id="menu"
+                  tone="savoury"
+                  title="New here? Start with these."
+                  intro="Indonesian comfort food. Tap a dish to order."
+                  dishes={SAVOURY_DISHES}
+                  onOrder={onOrder}
+                />
+              )}
+              {id === 'flavours' && (
+                <>
+                  <Ticker tone="cream" words={SWEET_WORDS} label="Milkshakes, smoothies, slushies, dirty soda, soft serve and the Fully Loaded Sundae." />
+                  <DishSection
+                    id="flavours"
+                    tone="sweet"
+                    title="Then a milkshake, because you’ve earned it."
+                    intro="Drinks and desserts, as serious as the food."
+                    dishes={SWEET_DISHES}
+                    onOrder={onOrder}
+                  />
+                </>
+              )}
               {id === 'story' && <StorySection client={data?.client} onOrder={onOrder} />}
               {id === 'visit' && (
-                <VisitScene client={data?.client} onBooking={onBooking} onOrder={onOrder} openNow={openNow} />
+                <>
+                  <Ticker
+                    tone="gold"
+                    words={[openNow?.label ?? 'Open 10 am – 9 pm', 'Esk Eats, Invercargill']}
+                    label={`${hoursLabel}, at Esk Eats, Invercargill Central.`}
+                  />
+                  <VisitScene client={data?.client} onBooking={onBooking} onOrder={onOrder} openNow={openNow} />
+                </>
               )}
-            </div>
+            </Fragment>
           ))}
         </main>
 
-        <footer className={styles.footer}>
-          <Ticker />
-          <div className={styles.footerBody}>
-            <div className={styles.footerRow}>
-              <a className={styles.footerLink} href={BALIBU_LOCATION.phoneHref}>
-                <Phone size={18} aria-hidden="true" /> {BALIBU_LOCATION.phone}
-              </a>
-              <OpenChip state={openNow} className={styles.footerOpen} />
-            </div>
-            <p className={styles.small}>
-              {BALIBU_LOCATION.address} · {BALIBU_LOCATION.hours.join(' · ')}
-            </p>
-          </div>
-        </footer>
-
-        {/* Phones: ordering stays under the thumb. */}
-        <div className={styles.mobileOrder}>
-          <button type="button" className="b-pill b-pill--gold" onClick={onOrder}>
-            Order online <ArrowUpRight size={18} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-        </div>
-
+        <SiteFooter openNow={openNow} />
+        <MobileBar sections={sections} onOrder={onOrder} />
         <CommerceDialog mode={mode} onClose={() => setMode(null)} openNow={openNow} />
       </div>
     </MotionConfig>

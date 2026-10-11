@@ -189,3 +189,23 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Warung board: headings painted on a cart sign, with an inset cream rule
+   and a hard drop shadow. */
+.balibu-site .b-signboard {
+  max-width: 100%;
+  padding: clamp(22px, 2.2vw, 34px) clamp(26px, 3vw, 44px) clamp(16px, 1.6vw, 26px);
+  border-radius: 20px 12px 18px 10px;
+  background: var(--b-ink);
+  color: var(--b-gold);
+  outline: 3px solid var(--b-paper);
+  outline-offset: -11px;
+  line-height: 0.88;
+  text-wrap: balance;
+  rotate: -1deg;
+  box-shadow: 0 12px 0 rgba(58, 36, 24, 0.28);
+}
+.balibu-site .b-signboard[data-tone='accent'] {
+  background: var(--b-accent);
+  color: var(--b-paper);
+}
