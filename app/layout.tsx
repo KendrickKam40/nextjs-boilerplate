@@ -4,12 +4,12 @@ import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 import { FOOD_IMAGES } from '@/lib/site-imagery';
 
-// Gerobak sign-painting: Bungee block capitals and a Yellowtail sign-writer's script.
+// Tall, ultra-condensed display capitals; Yellowtail stays as a small script accent.
 const display = localFont({
-  src: '../public/fonts/bungee-regular.ttf',
+  src: '../public/fonts/big-shoulders-display-variable.ttf',
   variable: '--font-display',
   display: 'swap',
-  weight: '400',
+  weight: '100 900',
 });
 const script = localFont({
   src: '../public/fonts/yellowtail-regular.ttf',

@@ -1,18 +1,29 @@
 .ticker {
+  position: relative;
+  z-index: 5;
   overflow: hidden;
-  border-block: 3px solid var(--b-ink);
   background: var(--b-gold);
   color: var(--b-ink);
 }
 .ticker[data-tone='red'] {
-  border-color: var(--b-ink);
   background: var(--b-accent);
   color: var(--b-on-accent);
+}
+.ticker[data-tone='cream'] {
+  background: var(--b-paper);
+  color: var(--b-ink);
+}
+/* Slung across the seam between two fields, like a banner on a cart. */
+.ticker[data-tilt] {
+  width: 106%;
+  margin: -34px -3% -34px;
+  rotate: -2.2deg;
+  box-shadow: 0 10px 24px #0002;
 }
 .track {
   display: flex;
   width: max-content;
-  animation: roll 38s linear infinite;
+  animation: roll 42s linear infinite;
 }
 @media (hover: hover) {
   .ticker:hover .track { animation-play-state: paused; }
@@ -29,14 +40,15 @@
   gap: clamp(18px, 2.4vw, 34px);
   padding: 16px clamp(9px, 1.2vw, 17px);
   font-family: var(--b-sign);
-  font-size: clamp(20px, 2.6vw, 36px);
+  font-size: clamp(26px, 3.4vw, 50px);
+  font-weight: 900;
   line-height: 1;
   white-space: nowrap;
   text-transform: uppercase;
 }
 .star {
-  width: 0.7em;
-  height: 0.7em;
+  width: 0.55em;
+  height: 0.55em;
   color: var(--b-accent);
 }
 .ticker[data-tone='red'] .star {
@@ -44,6 +56,10 @@
 }
 @keyframes roll {
   to { transform: translateX(-50%); }
+}
+@media (max-width: 700px) {
+  .ticker[data-tilt] { margin-block: -22px; }
+  .run li { padding-block: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .track { animation: none; }

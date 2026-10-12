@@ -1,0 +1,24 @@
+@font-face {
+  font-family: 'Big Shoulders Display';
+  src: url('../public/fonts/big-shoulders-display-variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('../public/fonts/manrope-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('../public/fonts/manrope-bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Yellowtail';
+  src: url('../public/fonts/yellowtail-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}

@@ -3,7 +3,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(36px, 6vw, 100px);
-  align-items: start;
+  align-items: center;
   padding: clamp(64px, 9vw, 140px) var(--b-gutter);
   background: var(--b-accent);
   color: var(--b-on-accent);
@@ -13,24 +13,15 @@
   min-width: 0;
 }
 .section .heading {
-  font-size: clamp(50px, 7.4vw, 128px);
+  max-width: 9ch;
+  font-size: clamp(56px, 8vw, 132px);
   color: var(--b-on-accent);
-  --b-shadow: var(--b-ink);
-}
-.heading em {
-  display: block;
-  margin: 0.04em 0 0 0.5em;
-  padding-bottom: 0.12em;
-  line-height: 1.25;
-  font-size: 0.86em;
-  color: var(--b-gold);
-  rotate: -5deg;
-  text-shadow: 0.03em 0.04em 0 var(--b-ink);
 }
 .section .venue {
   margin-top: clamp(26px, 3vw, 40px);
   font-family: var(--b-sign);
   font-size: clamp(18px, 1.6vw, 24px);
+  font-weight: 900;
 }
 .open {
   margin-top: 10px;
@@ -103,7 +94,7 @@
   margin-bottom: 10px;
   font-family: var(--b-sign);
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 900;
 }
 .hours ul {
   margin: 0;
@@ -129,46 +120,6 @@
   flex-direction: column;
   gap: 22px;
 }
-.counterPrint {
-  margin: 0;
-}
-.photo {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: 32px;
-  background: var(--b-ink);
-  box-shadow: 0 0 0 3px var(--b-on-accent);
-  rotate: 1.5deg;
-}
-.photo img {
-  object-fit: cover;
-}
-.photo > span {
-  position: absolute;
-  left: 18px;
-  bottom: 18px;
-  z-index: 1;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: var(--b-gold);
-  color: var(--b-ink);
-  font-family: var(--b-sign);
-  font-size: 14px;
-}
-.counterPrint figcaption {
-  padding-top: 12px;
-  font-size: 13px;
-  opacity: 0.85;
-}
-.counterPrint figcaption a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 28px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
 .visitNote {
   padding: clamp(24px, 2.6vw, 36px);
   border-radius: 28px;
@@ -178,14 +129,8 @@
 .section .visitNote h3 {
   font-family: var(--b-sign);
   font-size: clamp(26px, 2.6vw, 40px);
-  font-weight: 400;
+  font-weight: 900;
   line-height: 1;
-}
-.visitNote h3 em {
-  display: block;
-  margin-top: 4px;
-  font-size: 1.1em;
-  color: var(--b-gold);
 }
 .section .visitNote p {
   max-width: 46ch;
@@ -214,5 +159,4 @@
 }
 @media (max-width: 700px) {
   .section .action[data-kind='order'] { display: none; }
-  .photo { rotate: 0deg; border-radius: 24px; }
 }

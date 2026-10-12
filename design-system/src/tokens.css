@@ -1,0 +1,7 @@
+/* Next.js injects these from next/font in app/layout.tsx; outside the app the
+   families come from ../fonts.css. */
+:root {
+  --font-display: 'Big Shoulders Display';
+  --font-body: 'Manrope';
+  --font-script: 'Yellowtail';
+}

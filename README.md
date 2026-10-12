@@ -22,7 +22,7 @@ To check production while the dev server is running, use `NEXT_BUILD_DIR=.next-v
 ## Structure
 
 - `app/page.tsx`: small public page entry point.
-- `components/site/`: the long-scroll homepage (sticky sign bar, hero, ticker bands, Menu, Featured, Our story, Visit, footer close), shared sign-painting primitives in `site.css`, the data hook and the accessible ordering/booking dialog.
+- `components/site/`: the long-scroll homepage (sticky bar, hero slideshow, tilted open-now ticker, giant-word section, menu card rail, Our story, Something sweet, Visit, footer), shared primitives in `site.css`, the data hook and the accessible ordering/booking dialog.
 - `lib/site-content.ts`: typed restaurant data and editorial collection content.
 - `lib/site-imagery.ts`: shared local image collection; generation prompts and provenance are in `docs/assets/`.
 - `lib/site-location.ts`: published Balibu contact details and verified location links; sources are in [docs/location-sources.md](docs/location-sources.md).
@@ -36,13 +36,13 @@ To check production while the dev server is running, use `NEXT_BUILD_DIR=.next-v
 
 The public page follows the admin's stored section order, visibility and `layoutPreview`. Only theme colours set in `/admin` apply, scoped to the restaurant surface through `--b-*` variables (`lib/site-theme.ts` rejects low-contrast choices); POS colours are not applied. Older widgets remain in `components/` for existing integrations; the homepage uses `components/site/`.
 
-The homepage is painted like a gerobak, a hand-painted Indonesian food cart: drenched fields of sambal red, pandan green and palm-sugar yellow with coconut-cream type, Bungee block capitals with a painted shadow, and Yellowtail script asides. The hero is a red field with “BIG FLAVOUR.” and “Bali soul.” beside a single nasi goreng plate, which settles in on arrival and turns as you scroll. Ticker bands of real menu items run between sections and pause on hover; reduced-motion preferences keep everything still.
+The homepage takes its cues from bold food-and-drink brand sites: drenched fields of sambal red, pandan green and palm-sugar yellow, tall condensed Big Shoulders Display capitals, and big food cutouts. The hero is a slow slideshow: nasi goreng, rendang and a milkshake each hold for 7 seconds between two tall words, with the field colour cross-fading between dishes and the next dish peeking in, out of focus. It pauses on hover, focus, a hidden tab or the pause button, and doesn't autoplay with reduced motion. A tilted ticker shows live open status, “NASI GORENG” runs edge to edge with the plate passing through it on scroll, and the menu is a sideways rail of colour cards.
 
-Sections scroll in the admin's order and keep their deep links (`#menu`, `#flavours`, `#about`, `#contact`) beneath a sticky sign bar. The menu lists live sections with item names, prices and sold-out status when the restaurant service is configured, and falls back to editorial collections that name real dishes without prices. Featured switches between Smoky, Spicy and Sweet; Visit shows the attributed photo of the real Esk Eats counter, location, hours, open-now status and booking when enabled. The footer closes with “SEE YOU AT T.29”.
+Sections scroll in the admin's order and keep their deep links (`#menu`, `#about`, `#flavours` for Something sweet, `#contact`). The menu cards show live item names, prices and sold-out status when the restaurant service is configured, and named-dish editorial copy otherwise. Our story sits beside the attributed photo of the real Esk Eats counter. Something sweet gives the milkshake and sundae their own field, with live sweet prices. Visit shows location, hours, open-now status and booking when enabled.
 
 Order online sits in the sticky bar on larger screens and in a fixed bottom bar on phones. On screens 700px wide or narrower, ordering and booking open the provider in the same tab; larger screens use the dialog. Safe areas are respected and pinch zoom stays enabled.
 
-`lib/site-navigation.ts` defines the section ids and labels. The hero plate lives at `public/images/brand/floating-nasi-goreng.png`. No WebGL runtime or CDN dependency is needed.
+`lib/site-navigation.ts` defines the section ids and labels. Dish plates live at `public/images/brand/plate-*.png` (provenance in `docs/assets/higgsfield-plates.md`). No WebGL runtime or CDN dependency is needed.
 
 Local visual checkpoints are saved in `.design-checkpoints/` (ignored by Git), from the original scroll prototype through the click-based dish experience. The original generated assets remain in `public/images/brand/`.
 
@@ -67,10 +67,10 @@ Verify the deployment’s Firebase runtime/dependencies before enabling loyalty.
 
 The page supports keyboard navigation with a skip link, visible focus rings, reduced motion and an accessible native modal dialog. Browser Back closes the ordering dialog; focus returns to the triggering order control. A persistent external link offers an alternative to the embedded provider.
 
-Fonts are bundled in `public/fonts/` with their licences: Bungee and Manrope (SIL Open Font License) and Yellowtail (Apache 2.0). No Google Fonts requests are needed at runtime or build time.
+Fonts are bundled in `public/fonts/` with their licences: Big Shoulders Display and Manrope (SIL Open Font License) and Yellowtail (Apache 2.0). No Google Fonts requests are needed at runtime or build time.
 
 If running Next.js 15 on Node 25, start development with `NODE_OPTIONS=--no-experimental-webstorage npm run dev` to avoid the native Web Storage compatibility issue in the development overlay.
 
 The About wording draws gently on a small, documented review sample, alongside the published menu. Research and limitations are in `docs/review-research.md`; counter-photo provenance is in `docs/assets/store-collage.md`; published location sources are in `docs/location-sources.md`. Reviews are not fetched at runtime.
 
-The milkshake and Fully Loaded Sundae cutouts are generated solely from Balibu’s published online-ordering product photographs and are used in the menu and Featured sections. Original references, exact prompts and provenance are documented in `docs/assets/ordering-cutouts.md`.
+The milkshake and Fully Loaded Sundae cutouts are generated solely from Balibu’s published online-ordering product photographs and are used in the hero, the menu cards and Something sweet. Original references, exact prompts and provenance are documented in `docs/assets/ordering-cutouts.md`.

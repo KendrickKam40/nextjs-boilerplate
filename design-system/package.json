@@ -1,0 +1,9 @@
+{
+  "name": "@balibu/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Balibu site components packaged for Claude Design. Built from components/ by build.mjs; not used by the Next.js app.",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/types/design-system/src/index.d.ts"
+}

@@ -1,7 +1,7 @@
 import styles from './Ticker.module.css';
 
 // Only dishes and drinks confirmed on Balibu's published menu.
-const WORDS = [
+const MENU_WORDS = [
   'Nasi goreng',
   'Mie goreng',
   'Rendang',
@@ -9,8 +9,8 @@ const WORDS = [
   'Milkshakes',
   'Smoothies',
   'Slushies',
+  'Dirty soda',
   'Soft serve',
-  'T.29 Esk Eats',
 ];
 
 function Star() {
@@ -21,12 +21,24 @@ function Star() {
   );
 }
 
-/** A painted band of what's cooking, scrolling like a cart's banner in the wind. */
-export default function Ticker({ tone = 'gold' }: { tone?: 'gold' | 'red' }) {
-  const run = (hidden: boolean) => (
-    <ul className={styles.run} aria-hidden={hidden || undefined}>
-      {WORDS.map((word) => (
-        <li key={word}>
+/** A band that rolls across a seam: what's cooking, or whether we're open. */
+export default function Ticker({
+  tone = 'gold',
+  words = MENU_WORDS,
+  label,
+  tilt = false,
+}: {
+  tone?: 'gold' | 'red' | 'cream';
+  words?: string[];
+  label?: string;
+  tilt?: boolean;
+}) {
+  // Repeat short lists so one run is always wider than the screen.
+  const run = words.length < 6 ? [...words, ...words, ...words, ...words] : words;
+  const list = (
+    <ul className={styles.run}>
+      {run.map((word, i) => (
+        <li key={`${word}-${i}`}>
           <span>{word}</span>
           <Star />
         </li>
@@ -34,11 +46,11 @@ export default function Ticker({ tone = 'gold' }: { tone?: 'gold' | 'red' }) {
     </ul>
   );
   return (
-    <div className={styles.ticker} data-tone={tone}>
-      <span className="b-sr-only">On the menu: {WORDS.slice(0, -1).join(', ')}.</span>
+    <div className={styles.ticker} data-tone={tone} data-tilt={tilt || undefined}>
+      <span className="b-sr-only">{label ?? `On the menu: ${MENU_WORDS.join(', ')}.`}</span>
       <div className={styles.track} aria-hidden="true">
-        {run(true)}
-        {run(true)}
+        {list}
+        {list}
       </div>
     </div>
   );

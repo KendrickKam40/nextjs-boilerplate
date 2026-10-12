@@ -1,0 +1,85 @@
+/* A cream field where one dish's name runs edge to edge and the plate drops
+   through it on scroll. */
+.section {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: clamp(96px, 12vw, 180px) var(--b-gutter) clamp(64px, 8vw, 120px);
+  overflow: hidden;
+  background: var(--b-paper);
+  color: var(--b-ink);
+  container-type: inline-size;
+}
+.section .word {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.18em;
+  /* "NASI GORENG" is 4.98em wide with its gap; fill the content width. */
+  font-size: 19.6cqw;
+  line-height: 0.8;
+  color: var(--b-accent);
+  white-space: nowrap;
+}
+.plate {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: clamp(40px, 5vw, 90px);
+  width: min(34cqw, 560px);
+  aspect-ratio: 1;
+  margin-left: calc(min(34cqw, 560px) / -2);
+  filter: drop-shadow(0 30px 28px #0004);
+  pointer-events: none;
+}
+.plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.explain {
+  /* Right-aligned so it clears the plate passing through the centre. */
+  grid-column: 2;
+  justify-self: end;
+  position: relative;
+  z-index: 3;
+  max-width: min(30rem, 30cqw);
+  margin-top: clamp(28px, 4vw, 56px);
+}
+.section .explain h3 {
+  text-wrap: balance;
+  font-family: var(--b-sign);
+  font-size: clamp(30px, 3.4vw, 52px);
+  font-weight: 900;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.explain p {
+  margin-top: 14px;
+  color: var(--b-muted);
+  font-size: clamp(16px, 1.3vw, 19px);
+  line-height: 1.55;
+}
+@media (max-width: 700px) {
+  .section {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 72px;
+  }
+  .section .word {
+    flex-direction: column;
+    align-items: center;
+    /* GORENG is 2.88em: fill the width on its own line. */
+    font-size: 33cqw;
+    line-height: 0.82;
+  }
+  /* Phones: the plate sits under the word, just kissing it, not covering it. */
+  .plate {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 66cqw;
+    margin: -8cqw auto 0;
+  }
+  .explain { grid-column: 1; justify-self: start; max-width: none; margin-top: 32px; }
+}

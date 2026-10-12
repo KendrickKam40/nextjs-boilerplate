@@ -1,0 +1,123 @@
+.hero {
+  /* The plate straddles the terracotta/cream seam by half its size. */
+  --seam: clamp(300px, 36vw, 540px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--b-paper);
+  text-align: center;
+}
+.field {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(16px, 2vw, 26px);
+  padding: clamp(28px, 3.2vw, 48px) var(--b-gutter) calc(var(--seam) / 2 + 12px);
+  background: var(--b-accent);
+  color: var(--b-on-accent);
+}
+:global(.balibu-site) .hero .title {
+  padding: clamp(26px, 2.6vw, 40px) clamp(28px, 3.4vw, 56px) clamp(20px, 2vw, 32px);
+  border-radius: 22px 12px 20px 10px;
+  outline-offset: -12px;
+  font-size: clamp(56px, 7.6vw, 120px);
+  line-height: 0.86;
+  box-shadow: 0 14px 0 rgba(58, 36, 24, 0.3);
+}
+.sub {
+  max-width: 34ch;
+  font-size: clamp(17px, 1.4vw, 21px);
+  font-weight: 600;
+  line-height: 1.45;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.actions .browse {
+  color: var(--b-paper);
+}
+
+.trio {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: calc(var(--seam) / -2);
+}
+.cup {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: clamp(150px, 15vw, 230px);
+  height: auto;
+  margin-bottom: 2%;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 26px rgba(58, 36, 24, 0.32));
+  user-select: none;
+}
+.shake {
+  margin-right: clamp(-60px, -3vw, -30px);
+  transform: rotate(-7deg);
+}
+.soda {
+  margin-left: clamp(-60px, -3vw, -30px);
+  transform: rotate(6deg);
+}
+.plate {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  width: var(--seam);
+  aspect-ratio: 1;
+}
+.plate img {
+  object-fit: contain;
+  transform: rotate(-8deg);
+  filter: drop-shadow(0 30px 34px rgba(58, 36, 24, 0.35));
+  user-select: none;
+}
+.tag {
+  position: absolute;
+  right: -8%;
+  bottom: 6%;
+  padding: 12px 20px 9px;
+  border-radius: 12px 8px 12px 6px;
+  background: var(--b-gold);
+  color: var(--b-ink);
+  outline: 2px solid var(--b-ink);
+  outline-offset: -7px;
+  font-family: var(--b-sign);
+  font-size: clamp(22px, 2vw, 32px);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  rotate: -4deg;
+  box-shadow: 0 8px 0 rgba(58, 36, 24, 0.22);
+}
+
+/* Woven band: ink and turmeric rules around a row of diamonds. */
+.stripe {
+  align-self: stretch;
+  height: 30px;
+  margin-top: clamp(28px, 3.4vw, 52px);
+  background:
+    linear-gradient(var(--b-ink) 0 5px, var(--b-gold) 5px 8px, transparent 8px 22px, var(--b-gold) 22px 25px, var(--b-ink) 25px 30px),
+    url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2228%22%20height%3D%2214%22%3E%3Cpath%20d%3D%22M14%201%2026%207%2014%2013%202%207Z%22%20fill%3D%22%23e2b04a%22%2F%3E%3Cpath%20d%3D%22M14%204.5%2019%207%2014%209.5%209%207Z%22%20fill%3D%22%23bd2f1b%22%2F%3E%3Ccircle%20cx%3D%220%22%20cy%3D%227%22%20r%3D%221.6%22%20fill%3D%22%23f3e6cf%22%2F%3E%3Ccircle%20cx%3D%2228%22%20cy%3D%227%22%20r%3D%221.6%22%20fill%3D%22%23f3e6cf%22%2F%3E%3C%2Fsvg%3E') 0 8px / 28px 14px repeat-x,
+    var(--b-accent);
+}
+
+/* Phones: the plate alone, ordering lives in the bottom bar. */
+@media (max-width: 700px) {
+  .hero {
+    --seam: 82vw;
+  }
+  .cup,
+  .actions .order {
+    display: none;
+  }
+}
